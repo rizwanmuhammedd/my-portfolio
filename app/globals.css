@@ -1,95 +1,110 @@
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=Barlow:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500&display=swap');
 @import "tailwindcss";
 
+/* ═══════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════════ */
 :root {
-  --bg: #000000;
-  --fg: #ffffff;
-  --border: #1a1a1a;
-  --border2: #222222;
-  --muted: #333333;
-  --subtle: #444444;
-  --dim: #555555;
+  --a:   #c8f135;   /* acid yellow-green — primary accent */
+  --a2:  #b3d820;   /* hover darken */
+  --a10: #c8f13510;
+  --a20: #c8f13520;
+  --a30: #c8f13530;
+  --a50: #c8f13550;
+  --bg:  #000;
+  --b1:  #0f1208;   /* darkest border */
+  --b2:  #161c09;
+  --b3:  #1d270c;
+  --t1:  #c8f135;   /* accent text */
+  --t2:  #8aaa25;   /* mid */
+  --t3:  #4a6015;   /* dim */
+  --t4:  #283510;   /* very dim */
 }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-html {
-  scroll-behavior: smooth;
-  scroll-padding-top: 80px;
-}
-
+/* ═══════════════════════════════════════════
+   RESET
+═══════════════════════════════════════════ */
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0 }
+html { scroll-behavior:smooth; scroll-padding-top:76px }
 body {
-  background: #000;
-  color: #fff;
-  font-family: 'Barlow', sans-serif;
-  font-weight: 300;
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
+  background:#000; color:#fff;
+  font-family:'Barlow',sans-serif; font-weight:300;
+  overflow-x:hidden; -webkit-font-smoothing:antialiased;
 }
+::-webkit-scrollbar { width:2px }
+::-webkit-scrollbar-track { background:#000 }
+::-webkit-scrollbar-thumb { background:#c8f13540 }
+::-webkit-scrollbar-thumb:hover { background:#c8f135 }
+::selection { background:#c8f135; color:#000 }
 
-::-webkit-scrollbar { width: 2px; }
-::-webkit-scrollbar-track { background: #000; }
-::-webkit-scrollbar-thumb { background: #1e1e1e; }
-::selection { background: #fff; color: #000; }
+/* ═══════════════════════════════════════════
+   SHARED BUTTONS
+═══════════════════════════════════════════ */
+.btn {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:10px; font-weight:800; letter-spacing:.22em; text-transform:uppercase;
+  display:inline-flex; align-items:center; gap:8px;
+  padding:13px 28px; text-decoration:none; cursor:pointer; border:none;
+  transition:background .18s, color .18s, border-color .18s; white-space:nowrap;
+}
+.btn-solid { background:#c8f135; color:#000 }
+.btn-solid:hover { background:#b3d820 }
+.btn-ghost { background:transparent; color:#c8f135; border:1px solid #c8f13530 }
+.btn-ghost:hover { border-color:#c8f135; background:#c8f13508 }
 
-/* ── ILU Buttons ── */
-.ilu-btn {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 10px; font-weight: 800;
-  letter-spacing: .22em; text-transform: uppercase;
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 13px 26px; text-decoration: none;
-  cursor: pointer; border: none; transition: all .15s;
-  white-space: nowrap;
+/* ═══════════════════════════════════════════
+   SHARED SECTION HEADER
+═══════════════════════════════════════════ */
+.sec-eye {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:9px; font-weight:700; letter-spacing:.38em; text-transform:uppercase;
+  color:#c8f13545; display:block; margin-bottom:14px;
 }
-.ilu-btn-white { background: #fff; color: #000; }
-.ilu-btn-white:hover { background: #d6d6d6; }
-.ilu-btn-outline { background: transparent; color: #fff; border: 1px solid #2a2a2a; }
-.ilu-btn-outline:hover { border-color: #555; background: #070707; }
+.sec-h2 {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:clamp(38px,6.5vw,84px); font-weight:900;
+  text-transform:uppercase; letter-spacing:-.015em; line-height:.88;
+  color:#fff; margin-bottom:22px;
+}
+.sec-h2 .ghost { -webkit-text-stroke:1.5px rgba(200,241,53,.2); color:transparent }
+.sec-rule { height:1px; background:#1a1f0d }
 
-/* ── ILU Shared Header Typography ── */
-.ilu-eyebrow {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 9px; font-weight: 700;
-  letter-spacing: .38em; text-transform: uppercase;
-  color: #383838; display: block; margin-bottom: 16px;
-}
-.ilu-h2 {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: clamp(40px, 7vw, 86px);
-  font-weight: 900; text-transform: uppercase;
-  letter-spacing: -.015em; line-height: .88;
-  color: #fff; margin-bottom: 24px;
-}
-.ilu-h2 .ghost {
-  -webkit-text-stroke: 1px rgba(255,255,255,.13);
-  color: transparent;
-}
-.ilu-rule { height: 1px; background: #1a1a1a; }
-
-/* ── Background layer ── */
+/* ═══════════════════════════════════════════
+   BACKGROUND LAYER (grid + noise + scanline)
+═══════════════════════════════════════════ */
 .ilu-bg {
-  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  position:fixed; inset:0; pointer-events:none; z-index:0;
   background-image:
-    linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px),
-    linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px);
-  background-size: 80px 80px;
+    linear-gradient(90deg, rgba(200,241,53,.022) 1px, transparent 1px),
+    linear-gradient(rgba(200,241,53,.022) 1px, transparent 1px);
+  background-size:80px 80px;
 }
 .ilu-noise {
-  position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: .038;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.04;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-.ilu-scanline {
-  position: fixed; top: -60px; left: 0; right: 0; height: 60px;
-  background: linear-gradient(transparent, rgba(255,255,255,.008), transparent);
-  pointer-events: none; z-index: 0;
+.ilu-scan {
+  position:fixed; top:-70px; left:0; right:0; height:70px;
+  background:linear-gradient(transparent, rgba(200,241,53,.014), transparent);
+  pointer-events:none; z-index:0;
 }
 
-/* ── Corner marks ── */
-.ilu-c { position: fixed; pointer-events: none; z-index: 60; width:16px; height:16px; }
-.ilu-c-tl { top:14px; left:14px; border-top:1px solid #1c1c1c; border-left:1px solid #1c1c1c; }
-.ilu-c-tr { top:14px; right:14px; border-top:1px solid #1c1c1c; border-right:1px solid #1c1c1c; }
-.ilu-c-bl { bottom:14px; left:14px; border-bottom:1px solid #1c1c1c; border-left:1px solid #1c1c1c; }
-.ilu-c-br { bottom:14px; right:14px; border-bottom:1px solid #1c1c1c; border-right:1px solid #1c1c1c; }
+/* ═══════════════════════════════════════════
+   CORNER MARKS
+═══════════════════════════════════════════ */
+.ilu-c { position:fixed; pointer-events:none; z-index:60; width:14px; height:14px }
+.ilu-c-tl { top:12px; left:12px; border-top:1px solid #1d270c; border-left:1px solid #1d270c }
+.ilu-c-tr { top:12px; right:12px; border-top:1px solid #1d270c; border-right:1px solid #1d270c }
+.ilu-c-bl { bottom:12px; left:12px; border-bottom:1px solid #1d270c; border-left:1px solid #1d270c }
+.ilu-c-br { bottom:12px; right:12px; border-bottom:1px solid #1d270c; border-right:1px solid #1d270c }
 
-section { scroll-margin-top: 80px; }
+/* ═══════════════════════════════════════════
+   KEYFRAMES
+═══════════════════════════════════════════ */
+@keyframes blink      { 0%,100%{opacity:1} 50%{opacity:0} }
+@keyframes glow-pulse { 0%,100%{text-shadow:0 0 10px #c8f13535} 50%{text-shadow:0 0 30px #c8f13580,0 0 60px #c8f13528} }
+@keyframes marquee    { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+@keyframes float      { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+@keyframes spin-slow  { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+
+section { scroll-margin-top:76px }

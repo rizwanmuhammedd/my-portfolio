@@ -38,10 +38,10 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Risvan Muhammed | Full Stack .NET Developer",
-  description: "Passionate developer specialising in .NET backend development and modern frontend technologies.",
+  description: "Full Stack Developer specialising in .NET Core & React.js — Kozhikode, IN",
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
@@ -49,7 +49,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=Barlow:wght@300;400;500&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500&display=swap"
           rel="stylesheet"
         />
       </head>
