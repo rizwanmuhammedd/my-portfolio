@@ -271,35 +271,36 @@
 
 
 
-
-
 "use client";
 import { useEffect, useRef } from "react";
 import { gsap } from "@/public/lib/gsap";
 import { ScrollTrigger } from "gsap/all";
-import { ExternalLink, Github } from "lucide-react";
+import { ExternalLink, Github, ArrowUpRight } from "lucide-react";
 
 const PROJECTS = [
   {
-    id: 1, num: "01", cat: "Full Stack",
-    title: "Sport-X E-commerce",
-    desc: "A premium football gear e-commerce platform featuring product catalog, shopping cart, user authentication, and payment integration.",
-    tech: ["React", ".NET Core", "SQL Server", "AWS"],
-    live: "https://sportx-sx.vercel.app/", code: "#",
+    id:1, num:"01", cat:"Full Stack",
+    title:"Sport-X E-commerce",
+    desc:"A premium football gear e-commerce platform featuring product catalog, shopping cart, user authentication, and payment integration.",
+    tech:["React",".NET Core","SQL Server","AWS"],
+    live:"https://sportx-sx.vercel.app/", code:"#",
+    year:"2024",
   },
   {
-    id: 2, num: "02", cat: "Backend",
-    title: "Task Management API",
-    desc: "RESTful API for task management with user authentication, role-based access control, and real-time notifications via SignalR.",
-    tech: ["ASP.NET Core", "Entity Framework", "JWT Auth", "Swagger"],
-    live: "#", code: "https://github.com/rizwanmuhammedd/Build_a_Task_Management_API.git",
+    id:2, num:"02", cat:"Backend",
+    title:"Task Management API",
+    desc:"RESTful API for task management with user authentication, role-based access control, and real-time notifications via SignalR.",
+    tech:["ASP.NET Core","Entity Framework","JWT Auth","Swagger"],
+    live:"#", code:"https://github.com/rizwanmuhammedd/Build_a_Task_Management_API.git",
+    year:"2024",
   },
   {
-    id: 3, num: "03", cat: "Frontend",
-    title: "Portfolio Website",
-    desc: "Fully responsive portfolio with GSAP scroll animations, typing game, and modern brutalist design language.",
-    tech: ["Next.js", "GSAP", "Tailwind CSS", "TypeScript"],
-    live: "https://risvanmuhammed.vercel.app", code: "#",
+    id:3, num:"03", cat:"Frontend",
+    title:"Portfolio Website",
+    desc:"Fully responsive portfolio with GSAP scroll animations, typing game, and modern brutalist design language.",
+    tech:["Next.js","GSAP","Tailwind CSS","TypeScript"],
+    live:"https://risvanmuhammed.vercel.app", code:"#",
+    year:"2025",
   },
 ];
 
@@ -310,267 +311,318 @@ export default function Projects() {
     if (!secRef.current) return;
     const ctx = gsap.context(() => {
 
-      /* Section header */
-      gsap.fromTo([".pr-eye", ".pr-h2"],
-        { opacity: 0, y: 44 },
-        {
-          opacity: 1, y: 0, duration: .85, stagger: .14,
-          ease: "power4.out",
-          scrollTrigger: { trigger: ".pr-head", start: "top 82%" },
-        });
+      /* Header */
+      gsap.fromTo([".pr-eye",".pr-h2"],
+        { opacity:0, y:50 },
+        { opacity:1, y:0, duration:.9, stagger:.15, ease:"power4.out",
+          scrollTrigger:{ trigger:".pr-head", start:"top 82%" }});
       gsap.fromTo(".pr-rule",
-        { scaleX: 0, transformOrigin: "left" },
-        {
-          scaleX: 1, duration: .9, ease: "power3.out",
-          scrollTrigger: { trigger: ".pr-head", start: "top 82%" },
-        });
+        { scaleX:0, transformOrigin:"left" },
+        { scaleX:1, duration:1, ease:"power3.out",
+          scrollTrigger:{ trigger:".pr-head", start:"top 82%" }});
 
-      /* ── Per-project: slide in from outside viewport ──
-         Even index (0, 2, …) → comes from the LEFT  (x = -110vw)
-         Odd  index (1, 3, …) → comes from the RIGHT (x = +110vw)
-         On scroll back up → exits back to the same side
-         The section has overflow:hidden so nothing is visible outside
+      /* ── EXTREME card entrance ──
+         Card 0: clip from left  + rotate CW  + scale up
+         Card 1: clip from right + rotate CCW + scale up
+         Card 2: clip from bottom + skew + scale up
+         Each reverses when scrolling back past it
       */
-      document.querySelectorAll<HTMLElement>(".pr-row").forEach((row, i) => {
-        const dir = i % 2 === 0 ? -1 : 1;           // -1 = left, +1 = right
-        const fromX = `${dir * 108}vw`;
-        const toX   = "0vw";
+      document.querySelectorAll<HTMLElement>(".pr-card").forEach((card, i) => {
+        const variants = [
+          { clipPath:"inset(0 100% 0 0)", rotate: 4,  x:-40, y:0  },
+          { clipPath:"inset(0 0 0 100%)", rotate:-4,  x: 40, y:0  },
+          { clipPath:"inset(100% 0 0 0)", rotate: 0,  x:0,   y:60 },
+        ];
+        const v = variants[i % 3];
 
-        // Start fully off-screen
-        gsap.set(row, { x: fromX, opacity: 0 });
+        gsap.set(card, {
+          clipPath:v.clipPath,
+          rotation:v.rotate,
+          x:v.x, y:v.y,
+          opacity:0, scale:.88,
+          transformOrigin:"center center",
+        });
 
         ScrollTrigger.create({
-          trigger: row,
-          start: "top 86%",
-          onEnter: () => {
-            gsap.to(row, {
-              x: toX, opacity: 1,
-              duration: .9, ease: "power3.out",
-            });
-          },
-          onLeaveBack: () => {
-            gsap.to(row, {
-              x: fromX, opacity: 0,
-              duration: .55, ease: "power2.in",
-            });
-          },
+          trigger: card,
+          start: "top 84%",
+          onEnter: () => gsap.to(card, {
+            clipPath:"inset(0% 0% 0% 0%)",
+            rotation:0, x:0, y:0,
+            opacity:1, scale:1,
+            duration:1.0, ease:"power3.out",
+          }),
+          onLeaveBack: () => gsap.to(card, {
+            clipPath:v.clipPath,
+            rotation:v.rotate, x:v.x, y:v.y,
+            opacity:0, scale:.88,
+            duration:.6, ease:"power2.in",
+          }),
+        });
+      });
+
+      /* Magnetic hover on cards */
+      document.querySelectorAll<HTMLElement>(".pr-card").forEach(card => {
+        card.addEventListener("mousemove", (e) => {
+          const r  = card.getBoundingClientRect();
+          const dx = (e.clientX - r.left - r.width  / 2) / r.width;
+          const dy = (e.clientY - r.top  - r.height / 2) / r.height;
+          gsap.to(card, {
+            rotateY: dx * 6,
+            rotateX: -dy * 4,
+            duration:.3, ease:"power2.out",
+            transformPerspective:900,
+          });
+        });
+        card.addEventListener("mouseleave", () => {
+          gsap.to(card, { rotateY:0, rotateX:0, duration:.6, ease:"power3.out" });
         });
       });
 
       /* Footer */
       gsap.fromTo(".pr-foot",
-        { opacity: 0, y: 32 },
-        {
-          opacity: 1, y: 0, duration: .7,
-          scrollTrigger: { trigger: ".pr-foot", start: "top 90%" },
-        });
+        { opacity:0, y:32 },
+        { opacity:1, y:0, duration:.7,
+          scrollTrigger:{ trigger:".pr-foot", start:"top 90%" }});
 
     }, secRef);
     return () => ctx.revert();
   }, []);
 
-  return (
-    <>
-      <style>{`
-        .pr-sec {
-          background: var(--bg);
-          padding: 100px 0;
-          border-top: 1px solid var(--border);
-          position: relative; z-index: 1;
-          /* REQUIRED: clips off-screen sliding rows */
-          overflow: hidden;
-          transition: background .45s;
-        }
-        .pr-inner { max-width: 1280px; margin: 0 auto; padding: 0 32px; }
+  return (<>
+    <style>{`
+      .pr-sec {
+        background:var(--bg); padding:100px 0;
+        border-top:1px solid var(--border);
+        position:relative; z-index:1; overflow:hidden;
+        transition:background .45s;
+      }
+      .pr-inner { max-width:1280px; margin:0 auto; padding:0 32px; }
+      .pr-grid  { display:grid; grid-template-columns:1fr; gap:20px; }
 
-        /* Each project row — full width, no card box */
-        .pr-row {
-          border-bottom: 1px solid var(--border);
-          padding: 56px 0;
-          display: grid;
-          grid-template-columns: 56px 1fr 180px;
-          gap: 28px; align-items: start;
-          position: relative;
-          will-change: transform;
-          /* Hover bg + left accent line */
-          transition: background .22s;
-        }
-        .pr-row::before {
-          content: ''; position: absolute;
-          left: 0; top: 0; bottom: 0; width: 2px;
-          background: linear-gradient(
-            to bottom, transparent, var(--ac), transparent
-          );
-          transform: scaleY(0); transform-origin: center;
-          transition: transform .5s ease;
-        }
-        .pr-row:hover::before { transform: scaleY(1); }
-        .pr-row:hover { background: var(--ac-ghost); }
+      /* ── Card ── */
+      .pr-card {
+        border:1px solid var(--border);
+        position:relative; overflow:hidden;
+        cursor:default; background:var(--bg-alt);
+        transform-style:preserve-3d; will-change:transform;
+        transition:border-color .3s, background .3s;
+      }
+      .pr-card:hover { border-color:var(--border-ac); background:var(--bg-card); }
 
-        /* Number */
-        .pr-num {
-          font-family: 'Barlow Condensed', sans-serif;
-          font-size: 11px; font-weight: 700;
-          letter-spacing: .22em; color: var(--tm);
-          padding-top: 5px;
-        }
+      /* Accent corner — grows on hover */
+      .pr-card::before {
+        content:''; position:absolute;
+        top:0; left:0; width:0; height:3px;
+        background:var(--ac);
+        transition:width .5s ease;
+        z-index:2;
+      }
+      .pr-card:hover::before { width:100%; }
+      /* Bottom corner line */
+      .pr-card::after {
+        content:''; position:absolute;
+        bottom:0; right:0; width:3px; height:0;
+        background:var(--ac-dim);
+        transition:height .5s ease .1s;
+        z-index:2;
+      }
+      .pr-card:hover::after { height:100%; }
 
-        /* Body */
-        .pr-cat {
-          font-family: 'Barlow Condensed', sans-serif;
-          font-size: 9px; font-weight: 700;
-          letter-spacing: .3em; text-transform: uppercase;
-          color: var(--ac-dim); margin-bottom: 10px;
-        }
-        .pr-title {
-          font-family: 'Barlow Condensed', sans-serif;
-          font-size: clamp(26px, 3.4vw, 48px);
-          font-weight: 900; text-transform: uppercase;
-          letter-spacing: .02em; color: var(--tp);
-          line-height: 1; margin-bottom: 16px;
-          transition: color .22s, text-shadow .22s;
-        }
-        .pr-row:hover .pr-title {
-          color: var(--ac);
-          text-shadow: 0 0 40px rgba(200,241,53,.28);
-        }
-        html.light .pr-row:hover .pr-title {
-          text-shadow: 0 0 24px rgba(74,112,0,.22);
-        }
-        .pr-desc {
-          font-size: 14px; font-weight: 300;
-          line-height: 1.85; color: var(--ts);
-          max-width: 520px; margin-bottom: 18px;
-        }
-        .pr-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-        .pr-tag {
-          font-family: 'Barlow Condensed', sans-serif;
-          font-size: 9px; font-weight: 700;
-          letter-spacing: .12em; text-transform: uppercase;
-          color: var(--td); border: 1px solid var(--border);
-          padding: 5px 11px; transition: all .18s;
-        }
-        .pr-row:hover .pr-tag {
-          color: var(--ac-dim); border-color: var(--border-ac);
-        }
+      .pr-card-inner {
+        display:grid;
+        grid-template-columns:80px 1fr 200px;
+        gap:0; align-items:stretch;
+      }
 
-        /* Actions */
-        .pr-acts {
-          display: flex; flex-direction: column;
-          gap: 8px; padding-top: 5px;
-        }
-        .pr-btn {
-          font-family: 'Barlow Condensed', sans-serif;
-          font-size: 9px; font-weight: 800;
-          letter-spacing: .18em; text-transform: uppercase;
-          padding: 10px 15px;
-          display: inline-flex; align-items: center; gap: 7px;
-          text-decoration: none; cursor: pointer;
-          transition: all .2s; white-space: nowrap;
-        }
-        .pr-solid {
-          background: var(--ac); color: #000;
-          border: 1px solid var(--ac);
-        }
-        .pr-solid:hover {
-          background: var(--ac2);
-          transform: translateY(-2px);
-          box-shadow: 0 8px 22px rgba(200,241,53,.22);
-        }
-        .pr-ghost {
-          background: transparent; color: var(--td);
-          border: 1px solid var(--border);
-        }
-        .pr-ghost:hover {
-          border-color: var(--border-ac); color: var(--ac);
-          transform: translateY(-2px);
-        }
-        .pr-dis { opacity: .22; pointer-events: none; cursor: default; }
+      /* Left num column */
+      .pr-left {
+        padding:40px 24px;
+        border-right:1px solid var(--border);
+        display:flex; flex-direction:column;
+        justify-content:space-between; align-items:flex-start;
+        transition:border-color .3s;
+      }
+      .pr-card:hover .pr-left { border-color:var(--border-ac); }
+      .pr-num {
+        font-family:'Barlow Condensed',sans-serif;
+        font-size:36px; font-weight:900; letter-spacing:-.02em;
+        color:var(--tm); line-height:1;
+        transition:color .3s;
+      }
+      .pr-card:hover .pr-num { color:var(--ac-dim); }
+      .pr-year {
+        font-family:'Barlow Condensed',sans-serif;
+        font-size:10px; font-weight:700; letter-spacing:.22em;
+        text-transform:uppercase; color:var(--tm); writing-mode:vertical-lr;
+        rotate:180deg;
+      }
 
-        /* Footer */
-        .pr-foot {
-          margin-top: 60px; padding-top: 44px;
-          border-top: 1px solid var(--border);
-          display: flex; align-items: center;
-          justify-content: space-between; flex-wrap: wrap; gap: 16px;
-        }
-        .pr-foot-txt {
-          font-family: 'Barlow Condensed', sans-serif;
-          font-size: clamp(18px, 3vw, 38px); font-weight: 900;
-          text-transform: uppercase; color: var(--td);
-          letter-spacing: .03em;
-        }
+      /* Center body */
+      .pr-body { padding:40px 36px; }
+      .pr-cat {
+        font-family:'Barlow Condensed',sans-serif;
+        font-size:10px; font-weight:700; letter-spacing:.3em;
+        text-transform:uppercase; color:var(--ac-dim); margin-bottom:12px;
+      }
+      .pr-title {
+        font-family:'Barlow Condensed',sans-serif;
+        font-size:clamp(28px,3.6vw,52px); font-weight:900;
+        text-transform:uppercase; letter-spacing:.01em;
+        color:var(--tp); line-height:.95; margin-bottom:18px;
+        transition:color .25s;
+      }
+      .pr-card:hover .pr-title { color:var(--ac); }
+      .pr-desc {
+        font-size:15px; font-weight:300; line-height:1.85;
+        color:var(--ts); max-width:540px; margin-bottom:22px;
+      }
+      .pr-tags { display:flex; flex-wrap:wrap; gap:7px; }
+      .pr-tag {
+        font-family:'Barlow Condensed',sans-serif;
+        font-size:10px; font-weight:700; letter-spacing:.14em;
+        text-transform:uppercase; color:var(--td);
+        border:1px solid var(--border); padding:6px 13px;
+        transition:all .18s;
+      }
+      .pr-card:hover .pr-tag { color:var(--ac-dim); border-color:var(--border-ac); }
 
-        @media (max-width: 900px) {
-          .pr-row { grid-template-columns: 48px 1fr; }
-          .pr-acts { flex-direction: row; grid-column: 1 / -1; }
-        }
-        @media (max-width: 640px) {
-          .pr-sec { padding: 72px 0; }
-          .pr-row { padding: 36px 0; }
-          .pr-acts { flex-wrap: wrap; }
-        }
-      `}</style>
+      /* Right actions column */
+      .pr-right {
+        padding:40px 24px;
+        border-left:1px solid var(--border);
+        display:flex; flex-direction:column;
+        justify-content:space-between;
+        transition:border-color .3s;
+      }
+      .pr-card:hover .pr-right { border-color:var(--border-ac); }
 
-      <section id="projects" className="pr-sec" ref={secRef}>
-        <div className="pr-inner">
+      .pr-arrow {
+        width:48px; height:48px; border:1px solid var(--border);
+        display:flex; align-items:center; justify-content:center;
+        color:var(--td); align-self:flex-end;
+        transition:all .3s;
+      }
+      .pr-card:hover .pr-arrow {
+        border-color:var(--ac); color:var(--ac);
+        background:var(--ac-ghost);
+        transform:rotate(45deg) scale(1.1);
+        box-shadow:0 0 20px rgba(200,241,53,.2);
+      }
+      html.light .pr-card:hover .pr-arrow {
+        box-shadow:0 0 16px rgba(200,21,27,.18);
+      }
 
-          <div className="pr-head" style={{ marginBottom: 56 }}>
-            <span className="sec-eye pr-eye">( 02 ) — Selected Work</span>
-            <h2 className="sec-h2 pr-h2">Pro<span className="ghost">jects</span></h2>
-            <div className="sec-rule pr-rule" />
-          </div>
+      .pr-acts { display:flex; flex-direction:column; gap:8px; }
+      .pr-btn {
+        font-family:'Barlow Condensed',sans-serif;
+        font-size:10px; font-weight:800; letter-spacing:.18em;
+        text-transform:uppercase; padding:11px 16px;
+        display:inline-flex; align-items:center; gap:7px;
+        text-decoration:none; cursor:pointer; transition:all .2s;
+        white-space:nowrap; border:none;
+      }
+      .pr-solid { background:var(--ac); color:#000; }
+      .pr-solid:hover {
+        background:var(--ac2); transform:translateY(-2px);
+        box-shadow:0 8px 22px rgba(200,241,53,.25);
+      }
+      html.light .pr-solid:hover { box-shadow:0 8px 22px rgba(200,21,27,.2); }
+      .pr-ghost { background:transparent; color:var(--td); border:1px solid var(--border); }
+      .pr-ghost:hover { border-color:var(--border-ac); color:var(--ac); transform:translateY(-2px); }
+      .pr-dis { opacity:.22; pointer-events:none; cursor:default; }
 
-          {PROJECTS.map((p) => (
-            <div key={p.id} className="pr-row">
+      /* Footer */
+      .pr-foot {
+        margin-top:60px; padding-top:44px;
+        border-top:1px solid var(--border);
+        display:flex; align-items:center;
+        justify-content:space-between; flex-wrap:wrap; gap:16px;
+      }
+      .pr-foot-txt {
+        font-family:'Barlow Condensed',sans-serif;
+        font-size:clamp(20px,3vw,42px); font-weight:900;
+        text-transform:uppercase; color:var(--td); letter-spacing:.03em;
+      }
 
-              {/* Number */}
-              <div className="pr-num">{p.num}</div>
+      @media(max-width:900px) {
+        .pr-card-inner { grid-template-columns:60px 1fr; }
+        .pr-right { display:none; }
+        .pr-body { padding:28px 24px; }
+      }
+      @media(max-width:640px) {
+        .pr-sec { padding:72px 0; }
+        .pr-card-inner { grid-template-columns:1fr; }
+        .pr-left { display:none; }
+      }
+    `}</style>
 
-              {/* Details */}
-              <div>
-                <div className="pr-cat">{p.cat}</div>
-                <div className="pr-title">{p.title}</div>
-                <p className="pr-desc">{p.desc}</p>
-                <div className="pr-tags">
-                  {p.tech.map(t => (
-                    <span key={t} className="pr-tag">{t}</span>
-                  ))}
+    <section id="projects" className="pr-sec" ref={secRef}>
+      <div className="pr-inner">
+
+        <div className="pr-head" style={{marginBottom:56}}>
+          <span className="sec-eye pr-eye">( 02 ) — Selected Work</span>
+          <h2 className="sec-h2 pr-h2">Pro<span className="ghost">jects</span></h2>
+          <div className="sec-rule pr-rule"/>
+        </div>
+
+        <div className="pr-grid">
+          {PROJECTS.map(p => (
+            <div key={p.id} className="pr-card">
+              <div className="pr-card-inner">
+
+                {/* Left: big number */}
+                <div className="pr-left">
+                  <div className="pr-num">{p.num}</div>
+                  <div className="pr-year">{p.year}</div>
                 </div>
-              </div>
 
-              {/* Buttons */}
-              <div className="pr-acts">
-                {p.live !== "#" ? (
-                  <a href={p.live} target="_blank" rel="noopener noreferrer"
-                    className="pr-btn pr-solid">
-                    <ExternalLink size={10} strokeWidth={2} /> Live Demo
-                  </a>
-                ) : (
-                  <span className="pr-btn pr-solid pr-dis">
-                    <ExternalLink size={10} /> Live Demo
-                  </span>
-                )}
-                {p.code !== "#" ? (
-                  <a href={p.code} target="_blank" rel="noopener noreferrer"
-                    className="pr-btn pr-ghost">
-                    <Github size={10} strokeWidth={1.5} /> View Code
-                  </a>
-                ) : (
-                  <span className="pr-btn pr-ghost pr-dis">
-                    <Github size={10} strokeWidth={1.5} /> View Code
-                  </span>
-                )}
+                {/* Center: content */}
+                <div className="pr-body">
+                  <div className="pr-cat">{p.cat}</div>
+                  <div className="pr-title">{p.title}</div>
+                  <p className="pr-desc">{p.desc}</p>
+                  <div className="pr-tags">
+                    {p.tech.map(t => <span key={t} className="pr-tag">{t}</span>)}
+                  </div>
+                </div>
+
+                {/* Right: arrow + buttons */}
+                <div className="pr-right">
+                  <div className="pr-arrow">
+                    <ArrowUpRight size={20} strokeWidth={1.5}/>
+                  </div>
+                  <div className="pr-acts">
+                    {p.live !== "#"
+                      ? <a href={p.live} target="_blank" rel="noopener noreferrer" className="pr-btn pr-solid">
+                          <ExternalLink size={10} strokeWidth={2}/> Live Demo
+                        </a>
+                      : <span className="pr-btn pr-solid pr-dis">
+                          <ExternalLink size={10}/> Live Demo
+                        </span>
+                    }
+                    {p.code !== "#"
+                      ? <a href={p.code} target="_blank" rel="noopener noreferrer" className="pr-btn pr-ghost">
+                          <Github size={10} strokeWidth={1.5}/> View Code
+                        </a>
+                      : <span className="pr-btn pr-ghost pr-dis">
+                          <Github size={10} strokeWidth={1.5}/> View Code
+                        </span>
+                    }
+                  </div>
+                </div>
+
               </div>
             </div>
           ))}
-
-          <div className="pr-foot">
-            <div className="pr-foot-txt">Have a concept? Let's build it.</div>
-            <a href="#contact" className="btn btn-solid">Hire Me →</a>
-          </div>
         </div>
-      </section>
-    </>
-  );
+
+        <div className="pr-foot">
+          <div className="pr-foot-txt">Have a concept? Let's build it.</div>
+          <a href="#contact" className="btn btn-solid">Hire Me →</a>
+        </div>
+
+      </div>
+    </section>
+  </>);
 }

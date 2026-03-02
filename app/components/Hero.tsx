@@ -305,7 +305,6 @@
 // }
 
 
-
 "use client";
 import { useEffect } from "react";
 import { gsap } from "@/public/lib/gsap";
@@ -314,7 +313,7 @@ import { Github, Linkedin, Code2, Download, ExternalLink } from "lucide-react";
 /* Tech pills shown below the big name — like asharaf's pill row */
 const PILLS = [
   "React.js","Redux","GSAP","SQL Server","Tailwind CSS",
-  "ASP.NET Core","C#","TypeScript","Next.js","Azure",
+  "ASP.NET Core","SQL Server","C#","Entity Framework","Next.js","Azure" , "AWS",
 ];
 
 export default function Hero() {
@@ -382,11 +381,32 @@ export default function Hero() {
       { opacity: 0, y: 10 },
       { opacity: 1, y: 0, duration: .38, stagger: .08, delay: D + 1.18 });
 
-    /* Continuous glow on first name line */
-    gsap.to(".h-n1", {
-      textShadow: "0 0 80px rgba(200,241,53,.45)",
-      duration: 3, repeat: -1, yoyo: true, ease: "sine.inOut", delay: D + 1.8,
+    /* Photo slides in from right */
+    gsap.fromTo(".h-photo",
+      { opacity: 0, x: 40, scale: .94 },
+      { opacity: 1, x: 0, scale: 1, duration: 1.1, ease: "power3.out", delay: D + .18 });
+
+    /* Floating */
+    gsap.to(".h-photo", {
+      y: -12, duration: 4.2, repeat: -1, yoyo: true,
+      ease: "sine.inOut", delay: D + 1.0,
     });
+
+    /* 3-D tilt */
+    const frame = document.querySelector<HTMLElement>(".h-photo-inner");
+    if (frame) {
+      const mv = (e: MouseEvent) => {
+        const r = frame.getBoundingClientRect();
+        gsap.to(frame, {
+          rotateY: ((e.clientX - r.left - r.width/2) / r.width) * 8,
+          rotateX: -((e.clientY - r.top - r.height/2) / r.height) * 8,
+          duration: .4, ease: "power2.out", transformPerspective: 800,
+        });
+      };
+      const lv = () => gsap.to(frame, { rotateY: 0, rotateX: 0, duration: .9, ease: "power3.out" });
+      frame.addEventListener("mousemove", mv);
+      frame.addEventListener("mouseleave", lv);
+    }
 
   }, []);
 
@@ -452,27 +472,64 @@ export default function Hero() {
           flex-shrink: 0; animation: blink 1.4s step-end infinite;
         }
 
-        /* ── GIANT NAME — asharaf style: fills full width ── */
+        /* ── NAME + IMAGE row ── */
+        .h-name-row {
+          display: grid;
+          grid-template-columns: 1fr auto;
+          gap: 32px; align-items: flex-end;
+          margin-bottom: 32px;
+        }
+
+        /* ── GIANT NAME — fills full width ── */
         .h-name {
           font-family: 'Barlow Condensed', sans-serif;
           font-weight: 900; text-transform: uppercase;
-          line-height: .88; letter-spacing: -.02em;
-          /* Responsive: fill as much width as possible */
-          font-size: clamp(72px, 14.5vw, 200px);
-          margin-bottom: 32px;
+          line-height: .86; letter-spacing: -.02em;
+          font-size: clamp(76px, 14.5vw, 200px);
         }
-        /* Each line clipped from bottom for reveal */
         .h-n1, .h-n2 {
           display: block;
-          clip-path: inset(0 0 100% 0);  /* hidden until GSAP animates */
+          clip-path: inset(0 0 100% 0);
         }
         .h-n1 { color: var(--tp); }
-        .h-n2 {
-          color: var(--tp);
-          /* Second line slightly indented — like asharaf */
-          padding-left: .04em;
+        .h-n2 { color: var(--tp); padding-left: .04em; }
+
+        /* ── Photo beside name ── */
+        .h-photo {
+          opacity: 0;
+          width: clamp(140px, 18vw, 260px);
+          flex-shrink: 0; position: relative;
+          align-self: flex-end;
         }
-        /* In dark mode: first line gets the accent glow effect */
+        .h-photo-inner {
+          position: relative; overflow: hidden;
+          transform-style: preserve-3d;
+        }
+        .h-photo-inner img {
+          width: 100%; height: auto; display: block;
+          object-fit: cover;
+        }
+        /* Gradient fade into bg — fixes light/dark both */
+        .h-photo-shade {
+          position: absolute; inset: 0; pointer-events: none;
+          background: linear-gradient(
+            to bottom, transparent 30%, var(--bg) 100%
+          );
+        }
+        /* Left vignette so photo bleeds into name */
+        .h-photo-inner::before {
+          content: ''; position: absolute; inset: 0; z-index: 2;
+          background: linear-gradient(
+            to right, var(--bg) 0%, transparent 30%
+          );
+          pointer-events: none;
+        }
+        .h-photo-label {
+          position: absolute; bottom: 10px; right: 10px; z-index: 3;
+          font-family: 'Barlow Condensed', sans-serif;
+          font-size: 9px; font-weight: 700; letter-spacing: .22em;
+          text-transform: uppercase; color: var(--ac-dim);
+        }
 
         /* ── Tech pills row ── */
         .h-pills {
@@ -482,10 +539,10 @@ export default function Hero() {
         .h-pill {
           opacity: 0;
           font-family: 'Barlow Condensed', sans-serif;
-          font-size: 11px; font-weight: 700; letter-spacing: .14em;
+          font-size: 12px; font-weight: 700; letter-spacing: .14em;
           text-transform: uppercase;
           border: 1px solid var(--border);
-          color: var(--td); padding: 8px 18px;
+          color: var(--td); padding: 9px 20px;
           border-radius: 999px;
           background: transparent;
           transition: border-color .22s, color .22s, background .22s;
@@ -496,7 +553,7 @@ export default function Hero() {
           background: var(--ac-ghost);
         }
 
-        /* ── Bottom row: role + desc + ctas + socials ── */
+        /* ── Bottom row ── */
         .h-bottom {
           display: grid;
           grid-template-columns: 1fr 1fr;
@@ -504,7 +561,6 @@ export default function Hero() {
           border-top: 1px solid var(--border);
           padding-top: 32px;
         }
-
         .h-role {
           opacity: 0;
           display: flex; align-items: center; gap: 12px;
@@ -513,24 +569,23 @@ export default function Hero() {
         .h-role-bar { flex: 0 0 22px; height: 1px; background: var(--border-ac); }
         .h-role-txt {
           font-family: 'Barlow Condensed', sans-serif;
-          font-size: 11px; font-weight: 700; letter-spacing: .26em;
+          font-size: 13px; font-weight: 700; letter-spacing: .26em;
           text-transform: uppercase; color: var(--ts);
         }
         .h-desc {
-          opacity: 0; font-size: 15px; font-weight: 300;
+          opacity: 0; font-size: 16px; font-weight: 300;
           line-height: 1.9; color: var(--ts); max-width: 480px;
         }
-
         .h-right { display: flex; flex-direction: column; gap: 18px; }
         .h-cta-row { display: flex; gap: 10px; flex-wrap: wrap; }
         .h-cta { opacity: 0; }
         .h-soc-row { display: flex; gap: 6px; }
         .h-soc {
-          opacity: 0; width: 36px; height: 36px;
+          opacity: 0; width: 38px; height: 38px;
           border: 1px solid var(--border); background: transparent;
           color: var(--td); display: flex; align-items: center;
           justify-content: center; text-decoration: none;
-          border-radius: 0; transition: all .22s;
+          transition: all .22s;
         }
         .h-soc:hover {
           border-color: var(--border-ac); color: var(--ac);
@@ -538,16 +593,19 @@ export default function Hero() {
         }
 
         @media (max-width: 1024px) {
-          .hero-body  { padding: 108px 28px 52px; }
-          .h-name     { font-size: clamp(60px, 13vw, 160px); }
-          .h-bottom   { grid-template-columns: 1fr; gap: 24px; }
+          .hero-body   { padding: 108px 28px 52px; }
+          .h-name      { font-size: clamp(60px, 13vw, 160px); }
+          .h-bottom    { grid-template-columns: 1fr; gap: 24px; }
+          .h-photo     { width: clamp(110px, 16vw, 200px); }
         }
         @media (max-width: 640px) {
-          .hero-body  { padding: 96px 20px 44px; }
-          .h-name     { font-size: clamp(52px, 15vw, 100px); }
-          .h-cta-row  { flex-direction: column; }
-          .h-pills    { gap: 6px; }
-          .h-pill     { font-size: 10px; padding: 7px 14px; }
+          .hero-body   { padding: 96px 20px 44px; }
+          .h-name      { font-size: clamp(52px, 15vw, 100px); }
+          .h-name-row  { grid-template-columns: 1fr; }
+          .h-photo     { display: none; }
+          .h-cta-row   { flex-direction: column; }
+          .h-pills     { gap: 6px; }
+          .h-pill      { font-size: 11px; padding: 8px 15px; }
         }
       `}</style>
 
@@ -568,11 +626,20 @@ export default function Hero() {
           {/* Eyebrow */}
           <div className="h-badge">Full Stack Developer — Kozhikode, IN</div>
 
-          {/* ── GIANT NAME ── */}
-          <h1 className="h-name">
-            <span className="h-n1">Risvan</span>
-            <span className="h-n2">Muhammed.</span>
-          </h1>
+          {/* ── NAME + PHOTO row ── */}
+          <div className="h-name-row">
+            <h1 className="h-name">
+              <span className="h-n1">Risvan</span>
+              <span className="h-n2">Muhammed.</span>
+            </h1>
+            <div className="h-photo">
+              <div className="h-photo-inner">
+                <img src="/risw.jpg" alt="Risvan Muhammed" />
+                <div className="h-photo-shade" />
+                <div className="h-photo-label">RM</div>
+              </div>
+            </div>
+          </div>
 
           {/* ── Tech pills ── */}
           <div className="h-pills">

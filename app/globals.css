@@ -23,24 +23,23 @@
 }
 
 /* ═══════════════════════════════════════
-   LIGHT — warm parchment (#f0ebe2 base)
-   accent = dark olive green
+   LIGHT — clean white + red/black combo
 ═══════════════════════════════════════ */
 html.light {
-  --bg:        #eee9e0;
-  --bg-alt:    #e7e2d9;
-  --bg-card:   #e2ddd4;
-  --border:    rgba(30,25,10,.1);
-  --border-ac: rgba(60,90,0,.22);
-  --hdr-bg:    rgba(238,233,224,.9);
-  --tp:        #1c1a12;
-  --ts:        rgba(28,26,18,.58);
-  --td:        rgba(28,26,18,.38);
-  --tm:        rgba(28,26,18,.2);
-  --ac:        #3d6200;
-  --ac2:       #2f4c00;
-  --ac-dim:    rgba(61,98,0,.55);
-  --ac-ghost:  rgba(61,98,0,.07);
+  --bg:        #f8f8f8;
+  --bg-alt:    #f0f0f0;
+  --bg-card:   #ebebeb;
+  --border:    rgba(0,0,0,.1);
+  --border-ac: rgba(200,30,30,.25);
+  --hdr-bg:    rgba(248,248,248,.92);
+  --tp:        #0a0a0a;
+  --ts:        rgba(10,10,10,.62);
+  --td:        rgba(10,10,10,.4);
+  --tm:        rgba(10,10,10,.2);
+  --ac:        #c8151b;
+  --ac2:       #a81015;
+  --ac-dim:    rgba(200,21,27,.55);
+  --ac-ghost:  rgba(200,21,27,.07);
   --inp:       rgba(0,0,0,.04);
 }
 
