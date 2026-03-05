@@ -285,8 +285,6 @@
 
 
 
-
-
 "use client";
 import { useEffect, useRef } from "react";
 import { gsap } from "@/public/lib/gsap";
@@ -356,7 +354,35 @@ export default function Projects() {
     });
 
     mm.add("(max-width: 768px)", () => {
-      // Mobile: no pin, no horizontal scroll — cards stack vertically
+      /* ── MOBILE: each card slides in from alternating sides, scrubbed to scroll ──
+         Card 0 → from RIGHT  (+110vw)
+         Card 1 → from LEFT   (-110vw)
+         Card 2 → from RIGHT  (+110vw)
+         scrub: true = tied directly to scroll position (slow = slow, fast = fast)
+         toggleActions reverse so card exits back the same side when scrolling up
+      */
+      const panels = document.querySelectorAll<HTMLElement>(".pr-panel");
+      panels.forEach((panel, i) => {
+        const fromX = i % 2 === 0 ? "110vw" : "-110vw";
+        gsap.set(panel, { x: fromX, opacity: 0 });
+        ScrollTrigger.create({
+          trigger: panel,
+          start: "top 92%",
+          end: "top 18%",
+          scrub: 1.2,
+          onUpdate: (self) => {
+            // Slide from offscreen → center (progress 0→0.5) then center → other side (0.5→1)
+            // We only want in → center (stop at center), so clamp at 0.5
+            const p = Math.min(self.progress * 2, 1);
+            const sign = i % 2 === 0 ? 1 : -1;
+            const vw = window.innerWidth;
+            gsap.set(panel, {
+              x: sign * vw * 1.1 * (1 - p),
+              opacity: p,
+            });
+          },
+        });
+      });
     });
 
     return () => mm.revert();
@@ -562,8 +588,8 @@ export default function Projects() {
         /* ── MOBILE: vertical stack ── */
         @media (max-width: 768px) {
           .pr-inner   { height: auto; overflow: visible; }
-          .pr-track   { flex-direction: column; transform: none !important; align-items: stretch; }
-          .pr-panel   { width: 100%; padding: 24px 20px; height: auto; }
+          .pr-track   { flex-direction: column; align-items: stretch; }
+          .pr-panel   { width: 100%; padding: 24px 20px; height: auto; overflow: hidden; }
           .pr-card    { grid-template-columns: 1fr; gap: 28px; padding: 32px 28px; }
           .pr-header  { padding: 48px 20px 24px; }
           .pr-footer  { padding: 12px 20px; }

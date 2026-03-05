@@ -367,8 +367,6 @@
 
 
 
-
-
 "use client";
 import { useEffect, useRef } from "react";
 import { gsap } from "@/public/lib/gsap";
@@ -445,12 +443,38 @@ export default function Skills() {
     });
 
     mm.add("(max-width: 768px)", () => {
-      // mobile: normal scroll, animate bars when in view
+      /* ── MOBILE: each skill panel slides in from alternating sides ──
+         Panel 0 (Frontend)  → from RIGHT
+         Panel 1 (Backend)   → from LEFT
+         Panel 2 (Database)  → from RIGHT
+         Panel 3 (Tools)     → from LEFT
+         scrub: 1.2 = tied to scroll speed
+      */
+      const panels = document.querySelectorAll<HTMLElement>(".sk-panel");
+      panels.forEach((panel, i) => {
+        const sign = i % 2 === 0 ? 1 : -1;
+        gsap.set(panel, { x: sign * window.innerWidth * 1.1, opacity: 0 });
+        ScrollTrigger.create({
+          trigger: panel,
+          start: "top 92%",
+          end: "top 18%",
+          scrub: 1.2,
+          onUpdate: (self) => {
+            const p = Math.min(self.progress * 2, 1);
+            gsap.set(panel, {
+              x: sign * window.innerWidth * 1.1 * (1 - p),
+              opacity: p,
+            });
+          },
+        });
+      });
+
+      // Also trigger bars when visible
       document.querySelectorAll<HTMLElement>(".sk-bar-fill").forEach(el => {
         ScrollTrigger.create({
           trigger: el,
-          start: "top 90%",
-          onEnter: () => { el.style.width = el.dataset.p + "%"; },
+          start: "top 92%",
+          onEnter: () => { el.style.width = (el.dataset.p || "80") + "%"; },
         });
       });
     });
@@ -670,14 +694,12 @@ export default function Skills() {
       /* ── MOBILE: disable pin, vertical layout ── */
       @media (max-width: 768px) {
         .sk-inner   { height: auto; overflow: visible; }
-        .sk-track   { flex-direction: column; transform: none !important; align-items: stretch; }
-        .sk-panel   { width: 100%; padding: 20px 20px 28px; height: auto; }
+        .sk-track   { flex-direction: column; align-items: stretch; }
+        .sk-panel   { width: 100%; padding: 20px 20px 28px; height: auto; overflow: hidden; }
         .sk-card    { grid-template-columns: 1fr; gap: 28px; padding: 28px 24px; }
         .sk-hdr     { padding: 48px 20px 16px; }
         .sk-footer  { padding: 12px 20px; }
         .sk-big-num { font-size: 56px; }
-        /* Trigger bars on mobile via IntersectionObserver in CSS */
-        .sk-bar-fill { transition-delay: .3s; }
       }
       @media (max-width: 480px) {
         .sk-card  { padding: 22px 18px; }
