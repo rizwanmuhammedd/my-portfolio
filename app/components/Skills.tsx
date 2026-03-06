@@ -364,8 +364,6 @@
 
 
 
-
-
 "use client";
 import { useEffect, useRef } from "react";
 import { gsap } from "@/public/lib/gsap";
@@ -434,30 +432,35 @@ export default function Skills() {
         },
       });
 
-      // Desktop bars animate via ref timeout (see SkillCard ref callback)
-
     } else {
       /* ══════════════════════════════
          MOBILE — slide from sides
-         Section overflow-x:hidden clips.
-         Query .sk-mob-card directly.
-         scrub:1 ties to scroll speed.
+         Uses actual pixel vw so cards
+         start fully off-screen.
       ══════════════════════════════ */
       const cards = document.querySelectorAll<HTMLElement>(".sk-mob-card");
+      const vw = window.innerWidth;
 
       cards.forEach((card, i) => {
         const dir    = i % 2 === 0 ? 1 : -1;
-        const startX = `${dir * 110}%`;
+        const startX = dir * vw;   // full viewport width in pixels
 
         gsap.set(card, { x: startX, opacity: 0 });
 
         ScrollTrigger.create({
           trigger: card,
-          start: "top 85%",
+          start: "top 88%",
+          end:   "top 20%",
           onEnter: () =>
-            gsap.to(card, { x: "0%", opacity: 1, duration: 0.75, ease: "power3.out" }),
+            gsap.to(card, {
+              x: 0, opacity: 1,
+              duration: 0.8, ease: "power3.out",
+            }),
           onLeaveBack: () =>
-            gsap.to(card, { x: startX, opacity: 0, duration: 0.4, ease: "power2.in" }),
+            gsap.to(card, {
+              x: startX, opacity: 0,
+              duration: 0.45, ease: "power2.in",
+            }),
         });
 
         // Animate bars when card enters
@@ -533,7 +536,7 @@ export default function Skills() {
         width: 100%; border: 1px solid var(--border);
         background: var(--bg-card); position: relative; overflow: hidden;
         display: grid; grid-template-columns: 1fr 1fr;
-        gap: 40px; align-items: start; padding: 44px 48px;
+        gap: 40px; align-items: start; padding: 36px 44px;
         transition: border-color .3s, background .45s;
       }
       .sk-card::before {
@@ -548,40 +551,40 @@ export default function Skills() {
 
       .sk-big-num {
         font-family: 'Barlow Condensed', sans-serif;
-        font-size: 80px; font-weight: 900;
+        font-size: 72px; font-weight: 900;
         letter-spacing: -.03em; line-height: 1;
-        color: var(--tm); margin-bottom: 10px; transition: color .3s;
+        color: var(--tm); margin-bottom: 8px; transition: color .3s;
       }
       .sk-card:hover .sk-big-num { color: var(--ac-dim); }
-      .sk-hrow { display: flex; align-items: center; gap: 13px; margin-bottom: 16px; }
+      .sk-hrow { display: flex; align-items: center; gap: 13px; margin-bottom: 14px; }
       .sk-icon {
-        width: 44px; height: 44px; border: 1px solid var(--border);
+        width: 40px; height: 40px; border: 1px solid var(--border);
         display: flex; align-items: center; justify-content: center;
         color: var(--td); flex-shrink: 0; transition: all .25s;
       }
       .sk-card:hover .sk-icon { border-color: var(--border-ac); color: var(--ac); }
       .sk-title {
         font-family: 'Barlow Condensed', sans-serif;
-        font-size: 26px; font-weight: 900; text-transform: uppercase;
+        font-size: 24px; font-weight: 900; text-transform: uppercase;
         letter-spacing: .04em; color: var(--tp); transition: color .25s;
       }
       .sk-card:hover .sk-title { color: var(--ac); }
-      .sk-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+      .sk-tags { display: flex; flex-wrap: wrap; gap: 6px; }
       .sk-tag {
         font-family: 'Barlow Condensed', sans-serif;
         font-size: 11px; font-weight: 700; letter-spacing: .13em;
         text-transform: uppercase; color: var(--td);
-        border: 1px solid var(--border); padding: 6px 12px; transition: all .18s;
+        border: 1px solid var(--border); padding: 5px 10px; transition: all .18s;
       }
       .sk-card:hover .sk-tag { color: var(--ac-dim); border-color: var(--border-ac); }
       .sk-bars-lbl {
         font-family: 'Barlow Condensed', sans-serif;
         font-size: 12px; font-weight: 700; letter-spacing: .28em;
-        text-transform: uppercase; color: var(--ac-dim); margin-bottom: 20px;
+        text-transform: uppercase; color: var(--ac-dim); margin-bottom: 18px;
       }
-      .sk-prow { margin-bottom: 18px; }
+      .sk-prow { margin-bottom: 16px; }
       .sk-plbl {
-        display: flex; justify-content: space-between; margin-bottom: 8px;
+        display: flex; justify-content: space-between; margin-bottom: 7px;
         font-family: 'Barlow Condensed', sans-serif;
         font-size: 13px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase;
       }
@@ -598,7 +601,7 @@ export default function Skills() {
       /* ════════════════ MARQUEE ════════════════ */
       .sk-marquees {}
       .sk-mq {
-        height: 44px; display: flex; align-items: center;
+        height: 40px; display: flex; align-items: center;
         overflow: hidden; border-top: 1px solid var(--border);
         transition: background .45s;
       }
@@ -617,7 +620,7 @@ export default function Skills() {
         font-family: 'Barlow Condensed', sans-serif;
         font-size: 13px; font-weight: 800; letter-spacing: .2em;
         text-transform: uppercase; color: var(--td);
-        padding: 0 20px; display: inline-flex; align-items: center;
+        padding: 0 18px; display: inline-flex; align-items: center;
         gap: 10px; white-space: nowrap; flex-shrink: 0; transition: color .2s;
       }
       .sk-chip:hover { color: var(--ac); }
@@ -632,20 +635,30 @@ export default function Skills() {
         width: 100%; height: 100vh; overflow: hidden;
         display: flex; flex-direction: column;
       }
-      .sk-hdr { flex-shrink: 0; padding: 40px 52px 14px; border-bottom: 1px solid var(--border); }
+      /* Compact header — less wasted space */
+      .sk-hdr {
+        flex-shrink: 0;
+        padding: 24px 52px 12px;
+        border-bottom: 1px solid var(--border);
+      }
+      .sk-hdr .sec-eye { display: block; margin-bottom: 2px; }
+      .sk-hdr .sec-h2  { font-size: clamp(32px, 4vw, 52px); }
+
       .sk-prog { flex-shrink: 0; height: 2px; background: var(--border); }
       #sk-fill { height: 100%; background: var(--ac); width: 0%; }
       .sk-track {
         flex: 1; display: flex;
         will-change: transform; align-items: stretch;
+        min-height: 0; /* allow flex child to shrink */
       }
       .sk-slide {
         flex-shrink: 0; width: 100vw; height: 100%;
         display: flex; align-items: center;
-        justify-content: center; padding: 18px 60px;
+        justify-content: center;
+        padding: 14px 60px; /* reduced vertical padding so card fits */
       }
       .sk-ftr {
-        flex-shrink: 0; padding: 11px 52px;
+        flex-shrink: 0; padding: 10px 52px;
         display: flex; align-items: center;
         justify-content: space-between;
         border-top: 1px solid var(--border);
@@ -665,17 +678,12 @@ export default function Skills() {
       }
       .sk-ftr-ac { color: var(--ac); }
 
-      /* ════════════════ MOBILE ════════════════
-         Section has overflow-x:hidden — this clips
-         all cards that start at x:±100vw.
-         Cards are stacked vertically (normal flow).
-         GSAP moves each .sk-mob-card's x property.
-      ════════════════════════════════════════ */
+      /* ════════════════ MOBILE ════════════════ */
       .sk-mob-sec {
         background: var(--bg);
         border-top: 1px solid var(--border);
         padding: 52px 0 44px;
-        overflow-x: hidden;      /* CLIPS offscreen cards */
+        overflow-x: hidden;
         transition: background .45s;
       }
       .sk-mob-inner { padding: 0 18px; }
@@ -748,7 +756,6 @@ export default function Skills() {
         <Marquees />
         <div style={{marginTop:"22px"}}>
           {SKILLS.map(cat => (
-            /* .sk-mob-card queried by GSAP directly */
             <div key={cat.id} className="sk-mob-card">
               <SkillCard cat={cat}/>
             </div>

@@ -285,7 +285,6 @@
 
 
 
-
 "use client";
 import { useEffect,useRef } from "react";
 import { gsap } from "@/public/lib/gsap";
@@ -320,7 +319,7 @@ export default function Projects() {
   const outerRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-  const sectionRef = useRef<HTMLElement>(null); // used on mobile
+  const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -329,9 +328,6 @@ export default function Projects() {
     if (!isMobile) {
       /* ══════════════════════════════════════
          DESKTOP — pinned horizontal scrub
-         Outer is tall → gives scroll distance
-         Inner pins → stays in viewport
-         Track slides LEFT tied to scroll
       ══════════════════════════════════════ */
       const outer = outerRef.current;
       const inner = innerRef.current;
@@ -357,31 +353,34 @@ export default function Projects() {
 
     } else {
       /* ══════════════════════════════════════
-         MOBILE — each .pr-mob-card slides in
-         from alternating sides, scrubbed.
-
-         Key fixes vs previous attempt:
-         1. We query ".pr-mob-card" directly (no refs inside components)
-         2. The section itself has overflow-x:hidden to clip cards
-         3. We give each card a fixed translateX start so the
-            section doesn't expand horizontally
-         4. scrub:1 ties progress directly to scroll speed
+         MOBILE — cards slide from left/right
+         Using window.innerWidth (vw) so cards
+         actually start fully off-screen.
       ══════════════════════════════════════ */
       const cards = document.querySelectorAll<HTMLElement>(".pr-mob-card");
+      const vw = window.innerWidth;
 
       cards.forEach((card, i) => {
-        const dir    = i % 2 === 0 ? 1 : -1;
-        const startX = `${dir * 110}%`;
+        const dir    = i % 2 === 0 ? 1 : -1;   // even→from right, odd→from left
+        const startX = dir * vw;                 // pixels = full viewport width
 
+        // Set initial off-screen position
         gsap.set(card, { x: startX, opacity: 0 });
 
         ScrollTrigger.create({
           trigger: card,
-          start: "top 85%",
+          start: "top 88%",
+          end:   "top 20%",
           onEnter: () =>
-            gsap.to(card, { x: "0%", opacity: 1, duration: 0.75, ease: "power3.out" }),
+            gsap.to(card, {
+              x: 0, opacity: 1,
+              duration: 0.8, ease: "power3.out",
+            }),
           onLeaveBack: () =>
-            gsap.to(card, { x: startX, opacity: 0, duration: 0.4, ease: "power2.in" }),
+            gsap.to(card, {
+              x: startX, opacity: 0,
+              duration: 0.45, ease: "power2.in",
+            }),
         });
       });
     }
@@ -529,31 +528,25 @@ export default function Projects() {
 
         /* ════════════════════════════
            MOBILE
-           Key: section overflow-x:hidden
-           clips cards that start offscreen.
-           Cards are normal block flow (stacked).
-           GSAP moves each .pr-mob-card via x.
+           overflow-x:hidden on section clips
+           cards starting off-screen at ±100vw.
         ════════════════════════════ */
         .pr-mob-sec {
           background: var(--bg);
           border-top: 1px solid var(--border);
           padding: 56px 0 48px;
-          /* THIS IS THE CRITICAL LINE:
-             Clips the offscreen cards so page
-             doesn't scroll horizontally */
           overflow-x: hidden;
           transition: background .45s;
         }
         .pr-mob-inner { padding: 0 18px; }
         .pr-mob-hdr   { margin-bottom: 32px; }
 
-        /* Each card wrapper — block stacked, no overflow hidden needed
-           because the section itself clips everything */
         .pr-mob-card {
           margin-bottom: 20px;
-          /* will-change so browser knows transform is coming */
           will-change: transform;
+          /* initial state set by GSAP — off screen */
         }
+
         /* Mobile card layout — single column */
         .pr-mob-card .pr-card-grid {
           grid-template-columns: 1fr;
@@ -658,7 +651,6 @@ export default function Projects() {
           </div>
 
           {PROJECTS.map(p => (
-            /* .pr-mob-card is what GSAP animates (x position) */
             <div key={p.id} className="pr-mob-card">
               <div className="pr-card-box">
                 <div className="pr-card-grid">
@@ -684,7 +676,7 @@ export default function Projects() {
                             <Github size={12} strokeWidth={1.5} /> View Code
                           </a>
                         : <span className="pr-btn pr-ghost pr-dis"><Github size={12} strokeWidth={1.5} /> Code</span>
-                      }
+                        }
                     </div>
                   </div>
                 </div>
@@ -697,6 +689,3 @@ export default function Projects() {
     </>
   );
 }
-
-
-
