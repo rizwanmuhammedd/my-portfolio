@@ -300,11 +300,11 @@ const PROJECTS = [
     live: "https://sportx-sx.vercel.app/", code: "#",
   },
   {
-    id: 2, num: "02", cat: "Backend",
-    title: "Task Management API",
-    desc: "RESTful API for task management with user authentication, role-based access control, and real-time notifications via SignalR.",
-    tech: ["ASP.NET Core", "Entity Framework", "JWT Auth", "Swagger"],
-    live: "#", code: "https://github.com/rizwanmuhammedd/Build_a_Task_Management_API.git",
+    id: 2, num: "02", cat: "Full Stack",
+    title: "GOMEDIC",
+    desc: "A comprehensive Multi-SaaS Hospital Management System built with a microservices architecture, decoupling core healthcare workflows into scalable, independent services.",
+    tech: [".NET Microservices", "React", "SQL Server", "API Gateway"],
+    live: "#", code: "https://github.com/rizwanmuhammedd/GOMEDIC-project-.git",
   },
   {
     id: 3, num: "03", cat: "Frontend",
