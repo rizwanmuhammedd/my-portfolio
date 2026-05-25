@@ -294,10 +294,10 @@ import { ExternalLink, Github } from "lucide-react";
 const PROJECTS = [
   {
     id: 1, num: "01", cat: "Full Stack",
-    title: "Sport-X E-commerce",
-    desc: "A premium football gear e-commerce platform featuring product catalog, shopping cart, user authentication, and payment integration.",
-    tech: ["React", ".NET Core", "SQL Server", "AWS"],
-    live: "https://sportx-sx.vercel.app/", code: "#",
+    title: "SportX E-commerce",
+    desc: "A full-stack football gear platform serving 500+ users with secure checkout. Delivered 15+ backend APIs for product, cart, and auth modules. Optimized SQL queries to improve browsing speed by 35%.",
+    tech: ["ASP.NET Core", "SQL Server", "Dapper", "React.js", "Tailwind CSS", "Vercel"],
+    live: "https://sportx-sx.vercel.app/", code: "https://github.com/rizwanmuhammedd/SportX-Project",
   },
   {
     id: 2, num: "02", cat: "Full Stack",
@@ -309,9 +309,9 @@ const PROJECTS = [
   {
     id: 3, num: "03", cat: "Frontend",
     title: "Portfolio Website",
-    desc: "Fully responsive portfolio with GSAP scroll animations, typing game, and modern brutalist design language.",
+    desc: "Fully responsive portfolio with GSAP scroll animations, typing game, and modern brutalist design language, showcasing my work and technical expertise.",
     tech: ["Next.js", "GSAP", "Tailwind CSS", "TypeScript"],
-    live: "https://risvanmuhammed.vercel.app", code: "#",
+    live: "https://risvanmuhammed.vercel.app", code: "https://github.com/rizwanmuhammedd/portfolio-v2",
   },
 ];
 

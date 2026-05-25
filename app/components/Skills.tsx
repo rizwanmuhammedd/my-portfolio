@@ -370,30 +370,30 @@ import { gsap } from "@/public/lib/gsap";
 import { ScrollTrigger } from "gsap/all";
 import { Code, Database, Server, Wrench } from "lucide-react";
 
-const ROW_A = ["React.js","Redux","TypeScript","Next.js","Tailwind CSS","HTML5","CSS3","JavaScript ES6+","Responsive Design","GSAP"];
-const ROW_B = ["C#","ASP.NET Core","Web API","Entity Framework","ADO.NET","LINQ","SQL Server","MySQL","Azure","AWS","Docker","CI/CD"];
-const ROW_C = ["Git","GitHub","Visual Studio","VS Code","Postman","REST API","Swagger","SignalR","npm","JWT Auth"];
+const ROW_A = ["React.js", "JavaScript", "TypeScript", "Tailwind CSS", "Bootstrap", "HTML5", "CSS3", "Context API", "GSAP"];
+const ROW_B = ["C#", "ASP.NET Core", "EF Core", "ADO.NET", "Dapper", "REST APIs", "SQL Server", "Azure", "Azure SQL"];
+const ROW_C = ["Git", "GitHub", "Visual Studio", "VS Code", "npm", "SSMS", "Clean Architecture", "OOP", "Agile/Scrum"];
 
 const SKILLS = [
   {
-    id:"frontend", num:"01", title:"Frontend", Icon:Code,
-    tags:["HTML5","CSS3","JavaScript ES6+","React.js","Redux","Tailwind CSS","GSAP","Next.js","TypeScript"],
-    bars:[{n:"HTML / CSS",p:90},{n:"JavaScript",p:85},{n:"React.js",p:80},{n:"Next.js",p:78}],
+    id: "frontend", num: "01", title: "Frontend", Icon: Code,
+    tags: ["React.js", "Context API", "Tailwind CSS", "Bootstrap", "JavaScript", "HTML5", "CSS3"],
+    bars: [{ n: "React.js", p: 90 }, { n: "Tailwind CSS", p: 85 }, { n: "JavaScript", p: 80 }, { n: "Bootstrap", p: 75 }],
   },
   {
-    id:"backend", num:"02", title:".NET & Backend", Icon:Server,
-    tags:["C#","ASP.NET Core","Web API","Entity Framework","ADO.NET","LINQ","JWT Auth","SignalR"],
-    bars:[{n:"C#",p:88},{n:"ASP.NET Core",p:85},{n:"Web API",p:82},{n:"Entity Framework",p:80}],
+    id: "backend", num: "02", title: ".NET & Backend", Icon: Server,
+    tags: ["C#", "ASP.NET Core", "EF Core", "ADO.NET", "Dapper", "REST APIs"],
+    bars: [{ n: "ASP.NET Core", p: 92 }, { n: "C#", p: 88 }, { n: "EF Core", p: 82 }, { n: "Dapper", p: 80 }],
   },
   {
-    id:"database", num:"03", title:"Database & Cloud", Icon:Database,
-    tags:["SQL Server","MySQL","Azure","AWS","Database Design","Stored Procedures"],
-    bars:[{n:"SQL Server",p:87},{n:"Azure",p:75},{n:"MySQL",p:80},{n:"DB Design",p:82}],
+    id: "database", num: "03", title: "Database & Cloud", Icon: Database,
+    tags: ["SQL Server", "Stored Procedures", "Query Optimization", "Azure App Service", "Azure SQL", "Deployment"],
+    bars: [{ n: "SQL Server", p: 88 }, { n: "Query Optimization", p: 82 }, { n: "Azure", p: 75 }, { n: "Stored Procedures", p: 85 }],
   },
   {
-    id:"tools", num:"04", title:"Tools & DevOps", Icon:Wrench,
-    tags:["Git & GitHub","Visual Studio","VS Code","Postman","Docker","CI/CD","Swagger"],
-    bars:[{n:"Git & GitHub",p:90},{n:"Visual Studio",p:88},{n:"Docker",p:72},{n:"Postman",p:86}],
+    id: "tools", num: "04", title: "Tools & Concepts", Icon: Wrench,
+    tags: ["Git", "GitHub", "Visual Studio", "VS Code", "npm", "SSMS", "OOP", "Clean Architecture"],
+    bars: [{ n: "Git & GitHub", p: 90 }, { n: "Visual Studio", p: 88 }, { n: "Clean Architecture", p: 80 }, { n: "Agile", p: 85 }],
   },
 ];
 

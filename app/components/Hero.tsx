@@ -400,8 +400,8 @@ import { gsap } from "@/public/lib/gsap";
 import { Github, Linkedin, Code2, Download, ExternalLink } from "lucide-react";
 
 const PILLS = [
-  "React.js","Redux","GSAP","SQL Server","Tailwind CSS",
-  "ASP.NET Core","C#","TypeScript","Next.js","Azure",
+  "C#", "ASP.NET Core", "React.js", "SQL Server", "Tailwind CSS",
+  "JavaScript", "Azure", "REST APIs", "Clean Architecture", "Agile",
 ];
 
 export default function Hero() {
@@ -705,7 +705,7 @@ export default function Hero() {
       <section id="home" className="hero-sec">
         <div className="hero-body">
 
-          <div className="h-badge">Full Stack Developer — Kozhikode, IN</div>
+          <div className="h-badge">Full Stack Developer — .NET & React</div>
 
           {/* Name + Photo side by side (stacks on mobile) */}
           <div className="h-name-row">
@@ -733,12 +733,11 @@ export default function Hero() {
             <div>
               <div className="h-role">
                 <div className="h-role-bar" />
-                <div className="h-role-txt">.NET Core &amp; React Specialist</div>
+                <div className="h-role-txt">.NET &amp; React Specialist</div>
               </div>
               <p className="h-desc">
-                Building robust, scalable web applications with .NET backend and modern
-                frontend technologies. Performance-focused, clean architecture,
-                exceptional user experiences.
+                Specializing in building production-grade APIs and high-performance React frontends. 
+                Expert in SQL optimization, clean architecture, and delivering end-to-end features.
               </p>
             </div>
             <div className="h-right">
