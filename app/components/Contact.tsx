@@ -142,31 +142,31 @@ export default function Contact() {
   const ref = useRef<HTMLElement>(null);
   const [form, setForm] = useState({ name:"", email:"", message:"" });
   const [state, setState] = useState<"idle"|"sending"|"sent">("idle");
-  const [toast, setToast] = useState<{
+  const [modal, setModal] = useState<{
     show: boolean;
     message: string;
     type: "success" | "error";
     animatingOut: boolean;
   } | null>(null);
 
-  const showToast = (message: string, type: "success" | "error" = "success") => {
-    setToast({ show: true, message, type, animatingOut: false });
+  const showModal = (message: string, type: "success" | "error" = "success") => {
+    setModal({ show: true, message, type, animatingOut: false });
+  };
+
+  const closeModal = () => {
+    if (!modal) return;
+    setModal(prev => prev ? { ...prev, animatingOut: true } : null);
   };
 
   useEffect(() => {
-    if (!toast) return;
-    if (toast.animatingOut) {
+    if (!modal) return;
+    if (modal.animatingOut) {
       const timer = setTimeout(() => {
-        setToast(null);
-      }, 350);
-      return () => clearTimeout(timer);
-    } else {
-      const timer = setTimeout(() => {
-        setToast(prev => prev ? { ...prev, animatingOut: true } : null);
-      }, 4000);
+        setModal(null);
+      }, 300);
       return () => clearTimeout(timer);
     }
-  }, [toast]);
+  }, [modal]);
 
   useEffect(() => {
     if (!ref.current) return;
@@ -205,7 +205,7 @@ export default function Contact() {
 
       if (response.ok) {
         setState("sent");
-        showToast(`Thank you ${form.name}! Your message has been sent successfully.`, "success");
+        showModal(`Thank you ${form.name}! Your message has been sent successfully.`, "success");
         setForm({ name: "", email: "", message: "" });
         setTimeout(() => setState("idle"), 2800);
       } else {
@@ -213,7 +213,7 @@ export default function Contact() {
       }
     } catch (error) {
       setState("idle");
-      showToast("Oops! There was a problem sending your message. Please try again.", "error");
+      showModal("Oops! There was a problem sending your message. Please try again.", "error");
     }
   };
 
@@ -245,103 +245,126 @@ export default function Contact() {
       @media(max-width:1024px){.ct-grid{grid-template-columns:1fr;gap:36px;}}
       @media(max-width:640px){.ct-sec{padding:72px 0;}.ct-form{padding:24px 18px;}}
 
-      /* Toast Styles */
+      /* Modal Styles */
       :root {
         --err: #ef4444;
       }
       html.light {
         --err: #d93838;
       }
-      .toast-container {
+      .modal-overlay {
         position: fixed;
-        bottom: 24px;
-        right: 24px;
+        inset: 0;
         z-index: 9999;
-        pointer-events: none;
-        animation: toastIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      }
-      .toast-container.toast-out {
-        animation: toastOut 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      }
-      @keyframes toastIn {
-        from { opacity: 0; transform: translateY(24px) scale(0.95); }
-        to { opacity: 1; transform: translateY(0) scale(1); }
-      }
-      @keyframes toastOut {
-        from { opacity: 1; transform: translateY(0) scale(1); }
-        to { opacity: 0; transform: translateY(24px) scale(0.95); }
-      }
-      .toast-body {
-        pointer-events: auto;
         display: flex;
         align-items: center;
-        gap: 16px;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        padding: 20px;
+        animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      html.light .modal-overlay {
+        background: rgba(12, 12, 12, 0.4);
+      }
+      .modal-overlay.modal-out {
+        animation: modalFadeOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      @keyframes modalFadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      @keyframes modalFadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+      }
+      
+      .modal-card {
         background: var(--bg-card);
         border: 1px solid var(--border);
-        border-left: 4px solid var(--ac);
-        padding: 16px 20px;
-        min-width: 320px;
-        max-width: 420px;
-        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
-        transition: all 0.3s ease;
-        font-family: 'Barlow', sans-serif;
-      }
-      html.light .toast-body {
-        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
-      }
-      .toast-body.toast-error {
-        border-left-color: var(--err);
-      }
-      .toast-icon {
-        color: var(--ac);
-        flex-shrink: 0;
-      }
-      .toast-body.toast-error .toast-icon {
-        color: var(--err);
-      }
-      .toast-content {
+        width: 100%;
+        max-width: 400px;
+        padding: 36px 30px;
         display: flex;
         flex-direction: column;
-        flex-grow: 1;
+        align-items: center;
+        text-align: center;
+        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+        transform: scale(0.94) translateY(12px);
+        animation: modalZoomIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       }
-      .toast-title {
+      html.light .modal-card {
+        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.08);
+      }
+      .modal-overlay.modal-out .modal-card {
+        animation: modalZoomOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      @keyframes modalZoomIn {
+        from { transform: scale(0.94) translateY(12px); }
+        to { transform: scale(1) translateY(0); }
+      }
+      @keyframes modalZoomOut {
+        from { transform: scale(1) translateY(0); }
+        to { transform: scale(0.94) translateY(12px); }
+      }
+
+      .modal-icon-wrapper {
+        width: 64px;
+        height: 64px;
+        border: 1px solid var(--border-ac);
+        background: var(--ac-ghost);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 24px;
+        color: var(--ac);
+      }
+      .modal-icon-wrapper.error {
+        border-color: rgba(239, 68, 68, 0.2);
+        background: rgba(239, 68, 68, 0.04);
+        color: var(--err);
+      }
+      html.light .modal-icon-wrapper.error {
+        border-color: rgba(217, 56, 56, 0.2);
+        background: rgba(217, 56, 56, 0.04);
+      }
+
+      .modal-title {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 24px;
+        font-weight: 900;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        color: var(--tp);
+        margin-bottom: 12px;
+      }
+      
+      .modal-desc {
+        font-size: 14px;
+        font-weight: 300;
+        line-height: 1.6;
+        color: var(--ts);
+        margin-bottom: 28px;
+      }
+
+      .modal-btn {
         font-family: 'Barlow Condensed', sans-serif;
         font-size: 11px;
         font-weight: 800;
-        letter-spacing: 0.15em;
+        letter-spacing: 0.2em;
         text-transform: uppercase;
-        color: var(--tp);
-      }
-      .toast-desc {
-        font-size: 13px;
-        font-weight: 300;
-        color: var(--ts);
-        margin-top: 2px;
-        line-height: 1.4;
-      }
-      .toast-close {
-        background: none;
+        background: var(--ac);
+        color: #000;
         border: none;
-        color: var(--td);
-        font-size: 20px;
         cursor: pointer;
-        padding: 4px;
-        line-height: 1;
-        transition: color 0.18s;
+        padding: 12px 36px;
+        transition: background 0.18s, transform 0.18s, box-shadow 0.18s;
       }
-      .toast-close:hover {
-        color: var(--tp);
-      }
-      @media (max-width: 640px) {
-        .toast-container {
-          bottom: 16px;
-          left: 16px;
-          right: 16px;
-        }
-        .toast-body {
-          min-width: 0;
-          width: 100%;
-        }
+      .modal-btn:hover {
+        background: var(--ac2);
+        transform: translateY(-1px);
+        box-shadow: 0 8px 24px var(--ac-ghost);
       }
     `}</style>
     <section id="contact" className="ct-sec" ref={ref}>
@@ -384,19 +407,25 @@ export default function Contact() {
         </div>
       </div>
     </section>
-    {toast && (
-      <div className={`toast-container ${toast.animatingOut ? "toast-out" : ""}`}>
-        <div className={`toast-body toast-${toast.type}`}>
-          {toast.type === "success" ? (
-            <CheckCircle size={18} className="toast-icon" strokeWidth={2} />
-          ) : (
-            <AlertCircle size={18} className="toast-icon" strokeWidth={2} />
-          )}
-          <div className="toast-content">
-            <span className="toast-title">{toast.type === "success" ? "Success" : "Error"}</span>
-            <p className="toast-desc">{toast.message}</p>
+    {modal && (
+      <div className={`modal-overlay ${modal.animatingOut ? "modal-out" : ""}`} onClick={closeModal}>
+        <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+          <div className={`modal-icon-wrapper ${modal.type === "error" ? "error" : ""}`}>
+            {modal.type === "success" ? (
+              <CheckCircle size={32} strokeWidth={1.5} className="modal-icon" />
+            ) : (
+              <AlertCircle size={32} strokeWidth={1.5} className="modal-icon" />
+            )}
           </div>
-          <button className="toast-close" onClick={() => setToast(prev => prev ? { ...prev, animatingOut: true } : null)}>&times;</button>
+          <div className="modal-content">
+            <h3 className="modal-title">{modal.type === "success" ? "Message Sent" : "Oops!"}</h3>
+            <p className="modal-desc">{modal.message}</p>
+          </div>
+          <div className="modal-actions">
+            <button className="modal-btn" onClick={closeModal}>
+              Dismiss
+            </button>
+          </div>
         </div>
       </div>
     )}
