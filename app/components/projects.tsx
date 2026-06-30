@@ -295,21 +295,21 @@ const PROJECTS = [
   {
     id: 1, num: "01", cat: "Full Stack",
     title: "SportX E-commerce",
-    desc: "A full-stack football gear platform serving 500+ users with secure checkout. Delivered 15+ backend APIs for product, cart, and auth modules. Optimized SQL queries to improve browsing speed by 35%.",
-    tech: ["ASP.NET Core", "SQL Server", "Dapper", "React.js", "Tailwind CSS", "Vercel"],
+    desc: "A production-deployed B2C football accessories e-commerce platform architected with Domain-Driven Design and Clean Architecture. Features Razorpay payment gateway integration, secure JWT + Refresh Token auth, OTP verification, RBAC, and automated Order Lifecycle Management with status tracking.",
+    tech: ["ASP.NET Core 8", "C#", "EF Core", "SQL Server", "Razorpay", "JWT", "React.js", "TypeScript", "Tailwind CSS", "Vercel"],
     live: "https://sportx-sx.vercel.app/", code: "https://github.com/rizwanmuhammedd/SportX-Project",
   },
   {
     id: 2, num: "02", cat: "Full Stack",
-    title: "GOMEDIC",
-    desc: "A comprehensive Multi-SaaS Hospital Management System built with a microservices architecture, decoupling core healthcare workflows into scalable, independent services.",
-    tech: [".NET Microservices", "React", "SQL Server", "API Gateway"],
+    title: "GOMEDIC SaaS",
+    desc: "A comprehensive multi-tenant SaaS hospital management system built with a decoupled microservices architecture and Ocelot API Gateway. Includes a SignalR-based real-time notification engine for instant patient alerts, Bed Management, Pharmacy Stock Tracking, and automated Billing/Invoicing.",
+    tech: ["ASP.NET Core 8", "C#", "Microservices", "Ocelot Gateway", "SignalR", "SQL Server", "EF Core", "React 18", "TypeScript", "Docker"],
     live: "#", code: "https://github.com/rizwanmuhammedd/GOMEDIC-project-.git",
   },
   {
     id: 3, num: "03", cat: "Frontend",
     title: "Portfolio Website",
-    desc: "Fully responsive portfolio with GSAP scroll animations, typing game, and modern brutalist design language, showcasing my work and technical expertise.",
+    desc: "Fully responsive developer portfolio featuring GSAP scroll animations, 3D vertical stacked card interactions in the skills section, and customized light/dark color themes to showcase professional work and technical expertise.",
     tech: ["Next.js", "GSAP", "Tailwind CSS", "TypeScript"],
     live: "https://risvanmuhammed.vercel.app", code: "https://github.com/rizwanmuhammedd/portfolio-v2",
   },
@@ -317,54 +317,109 @@ const PROJECTS = [
 
 export default function Projects() {
   const outerRef = useRef<HTMLDivElement>(null);
-  const innerRef = useRef<HTMLDivElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
     const isMobile = window.innerWidth <= 768;
+    const tiltListeners: { el: HTMLElement; mv: (e: MouseEvent) => void; lv: () => void }[] = [];
 
     if (!isMobile) {
       /* ══════════════════════════════════════
-         DESKTOP — pinned horizontal scrub
+         DESKTOP — Skew-on-Scroll & Parallax Fade
       ══════════════════════════════════════ */
-      const outer = outerRef.current;
-      const inner = innerRef.current;
-      const track = trackRef.current;
-      if (!outer || !inner || !track) return;
+      const wrappers = gsap.utils.toArray<HTMLElement>(".pr-desk .pr-card-wrapper");
+      
+      // 1. Parallax fade and scale as cards scroll into viewport
+      wrappers.forEach((wrapper) => {
+        const cardBox = wrapper.querySelector(".pr-card-box");
+        if (cardBox) {
+          gsap.fromTo(cardBox,
+            { opacity: 0.3, y: 100, scale: 0.95 },
+            {
+              opacity: 1, y: 0, scale: 1,
+              ease: "none",
+              scrollTrigger: {
+                trigger: wrapper,
+                start: "top 98%",
+                end: "top 68%",
+                scrub: true,
+              }
+            }
+          );
+        }
+      });
+
+      // 2. Skew-on-Scroll based on scroll velocity
+      const cardBoxes = document.querySelectorAll<HTMLElement>(".pr-desk .pr-card-box");
+      
+      let proxy = { skew: 0 };
+      const skewSetter = gsap.quickTo(cardBoxes, "skewY", { duration: 0.4, ease: "power3" });
+      const clamp = gsap.utils.clamp(-8, 8); // Limit skew to max -8 to 8 degrees
 
       ScrollTrigger.create({
-        trigger: outer,
-        start: "top top",
-        end: () => `+=${track.scrollWidth - window.innerWidth}`,
-        pin: inner,
-        anticipatePin: 1,
-        scrub: 1.2,
-        invalidateOnRefresh: true,
-        onUpdate(self) {
-          gsap.set(track, {
-            x: -(track.scrollWidth - window.innerWidth) * self.progress,
-          });
-          const f = document.getElementById("pr-fill");
-          if (f) f.style.width = `${self.progress * 100}%`;
+        onUpdate: (self) => {
+          const skew = clamp(self.getVelocity() / -400);
+          if (Math.abs(skew) > Math.abs(proxy.skew)) {
+            proxy.skew = skew;
+            gsap.to(proxy, {
+              skew: 0,
+              duration: 0.8,
+              ease: "power3",
+              overwrite: "auto",
+              onUpdate: () => { skewSetter(proxy.skew); },
+            });
+          }
         },
+      });
+
+      // 3. 3D Tilt interactive hover effect
+      cardBoxes.forEach((card) => {
+        const mv = (e: MouseEvent) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const xc = rect.width / 2;
+          const yc = rect.height / 2;
+          const rotateY = ((x - xc) / xc) * 6; // max 6 deg
+          const rotateX = -((y - yc) / yc) * 6; // max 6 deg
+
+          gsap.to(card, {
+            rotateY,
+            rotateX,
+            scale: 1.015,
+            duration: 0.35,
+            ease: "power2.out",
+            transformPerspective: 1000,
+          });
+        };
+
+        const lv = () => {
+          gsap.to(card, {
+            rotateY: 0,
+            rotateX: 0,
+            scale: 1,
+            duration: 0.6,
+            ease: "power3.out",
+          });
+        };
+
+        card.addEventListener("mousemove", mv);
+        card.addEventListener("mouseleave", lv);
+        tiltListeners.push({ el: card, mv, lv });
       });
 
     } else {
       /* ══════════════════════════════════════
          MOBILE — cards slide from left/right
-         Using window.innerWidth (vw) so cards
-         actually start fully off-screen.
       ══════════════════════════════════════ */
       const cards = document.querySelectorAll<HTMLElement>(".pr-mob-card");
       const vw = window.innerWidth;
 
       cards.forEach((card, i) => {
-        const dir    = i % 2 === 0 ? 1 : -1;   // even→from right, odd→from left
-        const startX = dir * vw;                 // pixels = full viewport width
+        const dir    = i % 2 === 0 ? 1 : -1;
+        const startX = dir * vw;
 
-        // Set initial off-screen position
         gsap.set(card, { x: startX, opacity: 0 });
 
         ScrollTrigger.create({
@@ -385,7 +440,13 @@ export default function Projects() {
       });
     }
 
-    return () => ScrollTrigger.getAll().forEach(t => t.kill());
+    return () => {
+      tiltListeners.forEach(({ el, mv, lv }) => {
+        el.removeEventListener("mousemove", mv);
+        el.removeEventListener("mouseleave", lv);
+      });
+      ScrollTrigger.getAll().forEach(t => t.kill());
+    };
   }, []);
 
   return (
@@ -396,10 +457,12 @@ export default function Projects() {
         ════════════════════════════ */
         .pr-card-box {
           width: 100%;
+          max-width: 1080px;
+          margin: 0 auto;
           border: 1px solid var(--border);
           background: var(--bg-card);
           position: relative; overflow: hidden;
-          transition: border-color .3s, background .45s;
+          transition: border-color .3s, background .45s, transform .35s, box-shadow .35s;
         }
         .pr-card-box::before {
           content: ''; position: absolute;
@@ -472,10 +535,10 @@ export default function Projects() {
           position: relative; background: var(--bg);
           border-top: 1px solid var(--border);
           transition: background .45s;
+          padding-bottom: 100px;
         }
-        .pr-inner {
-          width: 100%; height: 100vh; overflow: hidden;
-          display: flex; flex-direction: column;
+        .pr-inner-vertical {
+          width: 100%; display: flex; flex-direction: column;
         }
         .pr-hdr {
           flex-shrink: 0; padding: 44px 52px 22px;
@@ -491,45 +554,28 @@ export default function Projects() {
         }
         .pr-hint-arrow {
           color: var(--ac);
-          animation: pr-arr 1.8s ease-in-out infinite;
+          animation: pr-arr-v 1.8s ease-in-out infinite;
         }
-        @keyframes pr-arr {
-          0%,100% { transform: translateX(0); }
-          50%     { transform: translateX(10px); }
+        @keyframes pr-arr-v {
+          0%,100% { transform: translateY(0); }
+          50%     { transform: translateY(8px); }
         }
-        .pr-prog { flex-shrink: 0; height: 2px; background: var(--border); }
-        #pr-fill { height: 100%; background: var(--ac); width: 0%; }
-        .pr-track {
-          flex: 1; display: flex;
-          will-change: transform; align-items: stretch;
+        
+        .pr-list-container {
+          max-width: 1080px;
+          margin: 64px auto 0;
+          padding: 0 48px;
+          display: flex;
+          flex-direction: column;
+          gap: 60px;
         }
-        .pr-slide {
-          flex-shrink: 0; width: 100vw; height: 100%;
-          display: flex; align-items: center;
-          justify-content: center; padding: 24px 60px;
+        .pr-card-wrapper {
+          width: 100%;
+          perspective: 1200px;
         }
-        .pr-ftr {
-          flex-shrink: 0; padding: 12px 52px;
-          display: flex; align-items: center;
-          justify-content: space-between;
-          border-top: 1px solid var(--border);
-        }
-        .pr-ftr-l {
-          font-family: 'Barlow Condensed', sans-serif;
-          font-size: 11px; font-weight: 700; letter-spacing: .26em;
-          text-transform: uppercase; color: var(--tm);
-        }
-        .pr-ftr-r {
-          font-family: 'Barlow Condensed', sans-serif;
-          font-size: 13px; font-weight: 800; letter-spacing: .18em;
-          text-transform: uppercase; color: var(--td);
-        }
-        .pr-ftr-ac { color: var(--ac); }
 
         /* ════════════════════════════
            MOBILE
-           overflow-x:hidden on section clips
-           cards starting off-screen at ±100vw.
         ════════════════════════════ */
         .pr-mob-sec {
           background: var(--bg);
@@ -544,7 +590,6 @@ export default function Projects() {
         .pr-mob-card {
           margin-bottom: 20px;
           will-change: transform;
-          /* initial state set by GSAP — off screen */
         }
 
         /* Mobile card layout — single column */
@@ -575,7 +620,7 @@ export default function Projects() {
       {/* ════════ DESKTOP ════════ */}
       <div className="pr-desk">
         <div ref={outerRef} className="pr-outer" id="projects">
-          <div ref={innerRef} className="pr-inner">
+          <section className="pr-inner-vertical">
 
             <div className="pr-hdr">
               <div>
@@ -586,15 +631,13 @@ export default function Projects() {
               </div>
               <div className="pr-hint-txt">
                 Scroll to explore
-                <span className="pr-hint-arrow">→</span>
+                <span className="pr-hint-arrow">↓</span>
               </div>
             </div>
 
-            <div className="pr-prog"><div id="pr-fill" /></div>
-
-            <div ref={trackRef} className="pr-track">
+            <div className="pr-list-container">
               {PROJECTS.map(p => (
-                <div key={p.id} className="pr-slide">
+                <div key={p.id} className="pr-card-wrapper">
                   <div className="pr-card-box">
                     <div className="pr-card-grid">
                       <div>
@@ -628,14 +671,7 @@ export default function Projects() {
               ))}
             </div>
 
-            <div className="pr-ftr">
-              <div className="pr-ftr-l">Slow scroll = slow slide</div>
-              <div className="pr-ftr-r">
-                <span className="pr-ftr-ac">{PROJECTS.length}</span> Projects
-              </div>
-            </div>
-
-          </div>
+          </section>
         </div>
       </div>
 

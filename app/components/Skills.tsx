@@ -370,30 +370,30 @@ import { gsap } from "@/public/lib/gsap";
 import { ScrollTrigger } from "gsap/all";
 import { Code, Database, Server, Wrench } from "lucide-react";
 
-const ROW_A = ["React.js", "JavaScript", "TypeScript", "Tailwind CSS", "Bootstrap", "HTML5", "CSS3", "Context API", "GSAP"];
-const ROW_B = ["C#", "ASP.NET Core", "EF Core", "ADO.NET", "Dapper", "REST APIs", "SQL Server", "Azure", "Azure SQL"];
-const ROW_C = ["Git", "GitHub", "Visual Studio", "VS Code", "npm", "SSMS", "Clean Architecture", "OOP", "Agile/Scrum"];
+const ROW_A = ["C#", "JavaScript", "TypeScript", "SQL", "React.js", "React 18", "Context API", "Bootstrap", "Tailwind CSS", "Responsive UI", "HTML5", "CSS3"];
+const ROW_B = ["ASP.NET Core 8", "ASP.NET MVC", "Web API", "EF Core", "Dapper", "ADO.NET", "REST API Design", "SQL Server", "Stored Procedures", "Query Optimization", "SSMS", "JWT Authentication", "RBAC"];
+const ROW_C = ["Clean Architecture", "Microservices", "Domain-Driven Design", "Repository Pattern", "SOLID", "OOP", "AWS", "Azure", "Vercel", "Docker", "Git", "GitHub", "Visual Studio", "VS Code", "Postman", "Swagger", "Agile", "Scrum"];
 
 const SKILLS = [
   {
     id: "frontend", num: "01", title: "Frontend", Icon: Code,
-    tags: ["React.js", "Context API", "Tailwind CSS", "Bootstrap", "JavaScript", "HTML5", "CSS3"],
-    bars: [{ n: "React.js", p: 90 }, { n: "Tailwind CSS", p: 85 }, { n: "JavaScript", p: 80 }, { n: "Bootstrap", p: 75 }],
+    tags: ["React.js", "React 18", "TypeScript", "Context API", "Bootstrap", "Tailwind CSS", "Responsive UI", "HTML5", "CSS3", "JavaScript"],
+    bars: [{ n: "React.js / Frontend", p: 90 }, { n: "TypeScript / JS", p: 85 }, { n: "Tailwind CSS", p: 88 }, { n: "Responsive UI", p: 92 }],
   },
   {
-    id: "backend", num: "02", title: ".NET & Backend", Icon: Server,
-    tags: ["C#", "ASP.NET Core", "EF Core", "ADO.NET", "Dapper", "REST APIs"],
-    bars: [{ n: "ASP.NET Core", p: 92 }, { n: "C#", p: 88 }, { n: "EF Core", p: 82 }, { n: "Dapper", p: 80 }],
+    id: "backend", num: "02", title: "Backend & Database", Icon: Server,
+    tags: ["C#", "ASP.NET Core 8", "Web API", "EF Core", "Dapper", "ADO.NET", "SQL Server", "Stored Procedures", "Query Optimization", "SSMS"],
+    bars: [{ n: "ASP.NET Core", p: 92 }, { n: "C# Language", p: 88 }, { n: "SQL Server / T-SQL", p: 86 }, { n: "EF Core / Dapper", p: 84 }],
   },
   {
-    id: "database", num: "03", title: "Database & Cloud", Icon: Database,
-    tags: ["SQL Server", "Stored Procedures", "Query Optimization", "Azure App Service", "Azure SQL", "Deployment"],
-    bars: [{ n: "SQL Server", p: 88 }, { n: "Query Optimization", p: 82 }, { n: "Azure", p: 75 }, { n: "Stored Procedures", p: 85 }],
+    id: "architecture", num: "03", title: "Architecture & Security", Icon: Database,
+    tags: ["Clean Architecture", "Microservices", "Domain-Driven Design", "Repository Pattern", "SOLID", "OOP", "JWT Auth", "RBAC", "OTP Verification"],
+    bars: [{ n: "Clean Architecture", p: 85 }, { n: "Microservices", p: 78 }, { n: "SOLID & OOP", p: 88 }, { n: "JWT & Security", p: 84 }],
   },
   {
-    id: "tools", num: "04", title: "Tools & Concepts", Icon: Wrench,
-    tags: ["Git", "GitHub", "Visual Studio", "VS Code", "npm", "SSMS", "OOP", "Clean Architecture"],
-    bars: [{ n: "Git & GitHub", p: 90 }, { n: "Visual Studio", p: 88 }, { n: "Clean Architecture", p: 80 }, { n: "Agile", p: 85 }],
+    id: "tools", num: "04", title: "Cloud, Tools & DevOps", Icon: Wrench,
+    tags: ["AWS", "Azure (basic)", "Vercel", "Docker (basic)", "Git", "GitHub", "Visual Studio", "VS Code", "Postman", "Swagger", "Agile / Scrum", "CI/CD"],
+    bars: [{ n: "Git & GitHub", p: 90 }, { n: "Visual Studio / VS Code", p: 88 }, { n: "AWS & Azure", p: 72 }, { n: "Docker & CI/CD", p: 70 }],
   },
 ];
 
@@ -405,45 +405,99 @@ export default function Skills() {
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
     const isMobile = window.innerWidth <= 768;
+    const tiltListeners: { el: HTMLElement; mv: (e: MouseEvent) => void; lv: () => void }[] = [];
 
     if (!isMobile) {
       /* ══════════════════════════════
-         DESKTOP — pinned horizontal
+         DESKTOP — vertical card stack overlap
       ══════════════════════════════ */
-      const outer = outerRef.current;
-      const inner = innerRef.current;
-      const track = trackRef.current;
-      if (!outer || !inner || !track) return;
+      const wrappers = gsap.utils.toArray<HTMLElement>(".sk-desk .sk-card-wrapper");
+      
+      wrappers.forEach((wrapper, i) => {
+        if (i === wrappers.length - 1) return;
 
-      ScrollTrigger.create({
-        trigger: outer,
-        start: "top top",
-        end: () => `+=${track.scrollWidth - window.innerWidth}`,
-        pin: inner,
-        anticipatePin: 1,
-        scrub: 1.2,
-        invalidateOnRefresh: true,
-        onUpdate(self) {
-          gsap.set(track, {
-            x: -(track.scrollWidth - window.innerWidth) * self.progress,
+        const nextWrapper = wrappers[i + 1];
+        
+        // Scale down, fade, and blur card i as card i+1 scrolls over it
+        gsap.to(wrapper, {
+          scale: 0.93,
+          opacity: 0.35,
+          filter: "blur(2px)",
+          ease: "none",
+          scrollTrigger: {
+            trigger: nextWrapper,
+            start: "top 75%",
+            end: "top 180px",
+            scrub: true,
+          }
+        });
+      });
+
+      // Animate progress bars when card enters screen
+      wrappers.forEach((wrapper) => {
+        ScrollTrigger.create({
+          trigger: wrapper,
+          start: "top 75%",
+          onEnter: () => {
+            wrapper.querySelectorAll<HTMLElement>(".sk-bar-fill").forEach(b => {
+              b.style.width = (b.dataset.p || "80") + "%";
+            });
+          },
+          onLeaveBack: () => {
+            wrapper.querySelectorAll<HTMLElement>(".sk-bar-fill").forEach(b => {
+              b.style.width = "0%";
+            });
+          }
+        });
+      });
+
+      // 3D Tilt interactive hover effect
+      const skCards = document.querySelectorAll<HTMLElement>(".sk-desk .sk-card");
+      skCards.forEach((card) => {
+        const mv = (e: MouseEvent) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const xc = rect.width / 2;
+          const yc = rect.height / 2;
+          const rotateY = ((x - xc) / xc) * 5; // max 5 deg
+          const rotateX = -((y - yc) / yc) * 5; // max 5 deg
+
+          gsap.to(card, {
+            rotateY,
+            rotateX,
+            scale: 1.01,
+            duration: 0.35,
+            ease: "power2.out",
+            transformPerspective: 1000,
           });
-          const f = document.getElementById("sk-fill");
-          if (f) f.style.width = `${self.progress * 100}%`;
-        },
+        };
+
+        const lv = () => {
+          gsap.to(card, {
+            rotateY: 0,
+            rotateX: 0,
+            scale: 1,
+            duration: 0.6,
+            ease: "power3.out",
+          });
+        };
+
+        card.addEventListener("mousemove", mv);
+        card.addEventListener("mouseleave", lv);
+        tiltListeners.push({ el: card, mv, lv });
       });
 
     } else {
       /* ══════════════════════════════
          MOBILE — slide from sides
-         Uses actual pixel vw so cards
-         start fully off-screen.
       ══════════════════════════════ */
       const cards = document.querySelectorAll<HTMLElement>(".sk-mob-card");
       const vw = window.innerWidth;
 
       cards.forEach((card, i) => {
         const dir    = i % 2 === 0 ? 1 : -1;
-        const startX = dir * vw;   // full viewport width in pixels
+        const startX = dir * vw;
 
         gsap.set(card, { x: startX, opacity: 0 });
 
@@ -476,7 +530,13 @@ export default function Skills() {
       });
     }
 
-    return () => ScrollTrigger.getAll().forEach(t => t.kill());
+    return () => {
+      tiltListeners.forEach(({ el, mv, lv }) => {
+        el.removeEventListener("mousemove", mv);
+        el.removeEventListener("mouseleave", lv);
+      });
+      ScrollTrigger.getAll().forEach(t => t.kill());
+    };
   }, []);
 
   const Marquees = () => (
@@ -515,12 +575,7 @@ export default function Skills() {
             <div key={b.n} className="sk-prow">
               <div className="sk-plbl"><span>{b.n}</span><span>{b.p}%</span></div>
               <div className="sk-bar-track">
-                <div className="sk-bar-fill" data-p={b.p}
-                  ref={el => {
-                    if (el && window.innerWidth > 768)
-                      setTimeout(() => { el.style.width = b.p + "%"; }, 800);
-                  }}
-                />
+                <div className="sk-bar-fill" data-p={b.p} />
               </div>
             </div>
           ))}
@@ -537,7 +592,7 @@ export default function Skills() {
         background: var(--bg-card); position: relative; overflow: hidden;
         display: grid; grid-template-columns: 1fr 1fr;
         gap: 40px; align-items: start; padding: 36px 44px;
-        transition: border-color .3s, background .45s;
+        transition: border-color .3s, background .45s, transform .35s, box-shadow .35s;
       }
       .sk-card::before {
         content: ''; position: absolute;
@@ -596,7 +651,7 @@ export default function Skills() {
         box-shadow: 0 0 10px rgba(200,241,53,.35);
         width: 0%; transition: width 1.3s cubic-bezier(.25,.46,.45,.94) .2s;
       }
-      html.light .sk-bar-fill { box-shadow: 0 0 8px rgba(200,21,27,.28); }
+      html.light .sk-bar-fill { box-shadow: 0 0 8px rgba(61,90,241,.28); }
 
       /* ════════════════ MARQUEE ════════════════ */
       .sk-marquees {}
@@ -630,53 +685,35 @@ export default function Skills() {
       .sk-outer {
         position: relative; background: var(--bg);
         border-top: 1px solid var(--border); transition: background .45s;
+        padding-bottom: 80px;
       }
-      .sk-inner {
-        width: 100%; height: 100vh; overflow: hidden;
-        display: flex; flex-direction: column;
+      .sk-inner-vertical {
+        width: 100%; display: flex; flex-direction: column;
       }
-      /* Compact header — less wasted space */
       .sk-hdr {
         flex-shrink: 0;
-        padding: 24px 52px 12px;
+        padding: 44px 52px 22px;
         border-bottom: 1px solid var(--border);
       }
       .sk-hdr .sec-eye { display: block; margin-bottom: 2px; }
       .sk-hdr .sec-h2  { font-size: clamp(32px, 4vw, 52px); }
 
-      .sk-prog { flex-shrink: 0; height: 2px; background: var(--border); }
-      #sk-fill { height: 100%; background: var(--ac); width: 0%; }
-      .sk-track {
-        flex: 1; display: flex;
-        will-change: transform; align-items: stretch;
-        min-height: 0; /* allow flex child to shrink */
+      /* Sticky Card Stack layout */
+      .sk-stack-container {
+        max-width: 1080px;
+        margin: 64px auto 0;
+        padding: 0 48px;
+        display: flex;
+        flex-direction: column;
+        gap: 60px;
       }
-      .sk-slide {
-        flex-shrink: 0; width: 100vw; height: 100%;
-        display: flex; align-items: center;
-        justify-content: center;
-        padding: 14px 60px; /* reduced vertical padding so card fits */
+      .sk-card-wrapper {
+        position: sticky;
+        top: 130px;
+        width: 100%;
+        transform-origin: center top;
+        will-change: transform, opacity, filter;
       }
-      .sk-ftr {
-        flex-shrink: 0; padding: 10px 52px;
-        display: flex; align-items: center;
-        justify-content: space-between;
-        border-top: 1px solid var(--border);
-      }
-      .sk-ftr-l {
-        font-family: 'Barlow Condensed', sans-serif;
-        font-size: 11px; font-weight: 700; letter-spacing: .26em;
-        text-transform: uppercase; color: var(--tm);
-        display: flex; align-items: center; gap: 10px;
-      }
-      .sk-arr { color: var(--ac-dim); animation: sk-b 1.8s ease-in-out infinite; }
-      @keyframes sk-b { 0%,100%{transform:translateX(0)} 50%{transform:translateX(10px)} }
-      .sk-ftr-r {
-        font-family: 'Barlow Condensed', sans-serif;
-        font-size: 13px; font-weight: 800; letter-spacing: .18em;
-        text-transform: uppercase; color: var(--td);
-      }
-      .sk-ftr-ac { color: var(--ac); }
 
       /* ════════════════ MOBILE ════════════════ */
       .sk-mob-sec {
@@ -718,29 +755,20 @@ export default function Skills() {
 
     {/* ════ DESKTOP ════ */}
     <div className="sk-desk">
-      <div ref={outerRef} className="sk-outer" id="skills">
-        <section ref={innerRef} className="sk-inner">
+      <div className="sk-outer" id="skills">
+        <section className="sk-inner-vertical">
           <div className="sk-hdr">
             <span className="sec-eye">( 01 ) — Technical Skills</span>
             <h2 className="sec-h2" style={{marginBottom:0}}>My <span className="ghost">Toolkit</span></h2>
           </div>
           <Marquees />
-          <div className="sk-prog"><div id="sk-fill"/></div>
-          <div ref={trackRef} className="sk-track">
+          
+          <div className="sk-stack-container">
             {SKILLS.map(cat => (
-              <div key={cat.id} className="sk-slide">
+              <div key={cat.id} className="sk-card-wrapper">
                 <SkillCard cat={cat}/>
               </div>
             ))}
-          </div>
-          <div className="sk-ftr">
-            <div className="sk-ftr-l">
-              Scroll slowly — each category slides in
-              <span className="sk-arr">→</span>
-            </div>
-            <div className="sk-ftr-r">
-              <span className="sk-ftr-ac">{SKILLS.length}</span> Categories
-            </div>
           </div>
         </section>
       </div>

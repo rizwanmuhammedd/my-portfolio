@@ -549,7 +549,7 @@ export default function Hero() {
         /* ── Name + Photo grid ── */
         .h-name-row {
           display:grid;
-          grid-template-columns:1fr 300px;
+          grid-template-columns:1fr 360px;
           gap:40px;align-items:flex-end;
           margin-bottom:38px;
         }
@@ -570,32 +570,60 @@ export default function Hero() {
           opacity:0;width:100%;position:relative;align-self:flex-end;
         }
         .h-photo-inner {
-          position:relative;overflow:hidden;
+          position:relative;
+          overflow:hidden;
           transform-style:preserve-3d;
+          perspective:1200px;
+          transition:border-radius .4s, border-color .4s, box-shadow .4s;
         }
         .h-photo-inner img {
           width:100%;
           /* Fixed height with object-fit so face is always visible */
-          height:360px;
+          height:440px;
           display:block;
           object-fit:cover;
           object-position:center top;
+          transform:translateZ(25px) scale(1.05); /* Parallax 3D float! */
+          transform-style:preserve-3d;
+          transition:transform .4s;
         }
         /* Bottom fade blends into bg */
         .h-photo-shade {
           position:absolute;inset:0;pointer-events:none;z-index:1;
           background:linear-gradient(to bottom,transparent 45%,var(--bg) 100%);
+          transition:opacity .4s, visibility .4s;
         }
         /* Left fade blends into name text */
         .h-photo-side {
           position:absolute;inset:0;pointer-events:none;z-index:2;
           background:linear-gradient(to right,var(--bg) 0%,transparent 30%);
+          transition:opacity .4s, visibility .4s;
+        }
+        html.light .h-photo-shade,
+        html.light .h-photo-side {
+          opacity:0;visibility:hidden;
+        }
+        html.light .h-photo-inner {
+          border-radius:20px;
+          border:1px solid var(--border);
+          box-shadow:0 20px 40px rgba(0,0,0,0.06);
         }
         .h-photo-label {
           position:absolute;bottom:14px;right:14px;z-index:3;
           font-family:'Barlow Condensed',sans-serif;
-          font-size:11px;font-weight:700;letter-spacing:.24em;
-          text-transform:uppercase;color:var(--ac-dim);
+          font-size:11px;font-weight:900;letter-spacing:.24em;
+          text-transform:uppercase;color:var(--ac);
+          background:rgba(0,0,0,0.6);
+          backdrop-filter:blur(4px);
+          padding:4px 8px;
+          border-radius:4px;
+          border:1px solid var(--border);
+          transform:translateZ(50px); /* Parallax floats higher! */
+          box-shadow:0 5px 15px rgba(0,0,0,0.3);
+        }
+        html.light .h-photo-label {
+          background:rgba(255,255,255,0.75);
+          color:var(--ac);
         }
 
         /* Tech pills */
@@ -652,8 +680,8 @@ export default function Hero() {
         @media (max-width:1100px) {
           .hero-body  { padding:112px 36px 56px; }
           .h-name     { font-size:clamp(68px,12vw,170px); }
-          .h-name-row { grid-template-columns:1fr 240px;gap:28px; }
-          .h-photo-inner img { height:300px; }
+          .h-name-row { grid-template-columns:1fr 280px;gap:28px; }
+          .h-photo-inner img { height:380px; }
           .h-bottom   { grid-template-columns:1fr;gap:26px; }
         }
 
@@ -668,12 +696,12 @@ export default function Hero() {
           }
           .h-photo {
             width:100%;
-            max-width:340px;
+            max-width:380px;
             margin:0 auto;
             /* Reset align so it flows normally */
             align-self:auto;
           }
-          .h-photo-inner img { height:300px; }
+          .h-photo-inner img { height:380px; }
           /* No left fade needed when photo is full-width stacked */
           .h-photo-side { display:none; }
           .h-pills    { gap:7px; }
@@ -685,7 +713,7 @@ export default function Hero() {
         @media (max-width:480px) {
           .hero-body  { padding:92px 18px 40px; }
           .h-name     { font-size:clamp(46px,14vw,100px); }
-          .h-photo-inner img { height:260px; }
+          .h-photo-inner img { height:320px; }
           .h-pill     { font-size:11px;padding:8px 14px; }
           .h-desc     { font-size:16px; }
         }

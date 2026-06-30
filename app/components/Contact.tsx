@@ -154,15 +154,42 @@ export default function Contact() {
     return ()=>ctx.revert();
   },[]);
 
+  // TO RECEIVE EMAILS: Sign up at https://formspree.io/ (takes 30 seconds),
+  // create a new form, and replace the placeholder ID below with your Formspree Form ID.
+  const FORMSPREE_FORM_ID = "xbdvaygq"; // Replace this with your form ID
+
   const onChange=(e:React.ChangeEvent<HTMLInputElement|HTMLTextAreaElement>)=>setForm({...form,[e.target.name]:e.target.value});
-  const onSubmit=(e:React.FormEvent)=>{
-    e.preventDefault(); setState("sending");
-    setTimeout(()=>{
-      setState("sent");
-      alert(`Thank you ${form.name}! I'll be in touch at ${form.email}.`);
-      setForm({name:"",email:"",message:""});
-      setTimeout(()=>setState("idle"),2800);
-    },750);
+  
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setState("sending");
+
+    try {
+      const response = await fetch(`https://formspree.io/f/${FORMSPREE_FORM_ID}`, {
+        method: "POST",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          message: form.message,
+        }),
+      });
+
+      if (response.ok) {
+        setState("sent");
+        alert(`Thank you ${form.name}! Your message has been sent successfully.`);
+        setForm({ name: "", email: "", message: "" });
+        setTimeout(() => setState("idle"), 2800);
+      } else {
+        throw new Error("Submission failed");
+      }
+    } catch (error) {
+      setState("idle");
+      alert(`Oops! There was a problem sending your message. You can also mail me directly at risvanmd172@gmail.com`);
+    }
   };
 
   return (<>

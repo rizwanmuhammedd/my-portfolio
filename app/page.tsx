@@ -14,7 +14,7 @@ import Footer from "./components/Footer";
 
 export default function Home() {
   return (
-    <main style={{ position:"relative", minHeight:"100vh", background:"#000" }}>
+    <main style={{ position:"relative", minHeight:"100vh", background:"var(--bg)" }}>
       <FloatingShapes />
       <Header />
       <Hero />
