@@ -490,42 +490,45 @@ export default function Skills() {
 
     } else {
       /* ══════════════════════════════
-         MOBILE — slide from sides
+         MOBILE — vertical card stack overlap
       ══════════════════════════════ */
-      const cards = document.querySelectorAll<HTMLElement>(".sk-mob-card");
-      const vw = window.innerWidth;
+      const wrappers = gsap.utils.toArray<HTMLElement>(".sk-mob .sk-mob-card");
+      
+      wrappers.forEach((wrapper, i) => {
+        if (i === wrappers.length - 1) return;
 
-      cards.forEach((card, i) => {
-        const dir    = i % 2 === 0 ? 1 : -1;
-        const startX = dir * vw;
-
-        gsap.set(card, { x: startX, opacity: 0 });
-
-        ScrollTrigger.create({
-          trigger: card,
-          start: "top 88%",
-          end:   "top 20%",
-          onEnter: () =>
-            gsap.to(card, {
-              x: 0, opacity: 1,
-              duration: 0.8, ease: "power3.out",
-            }),
-          onLeaveBack: () =>
-            gsap.to(card, {
-              x: startX, opacity: 0,
-              duration: 0.45, ease: "power2.in",
-            }),
+        const nextWrapper = wrappers[i + 1];
+        
+        // Scale down, fade, and blur card i as card i+1 scrolls over it
+        gsap.to(wrapper, {
+          scale: 0.93,
+          opacity: 0.35,
+          filter: "blur(2px)",
+          ease: "none",
+          scrollTrigger: {
+            trigger: nextWrapper,
+            start: "top 75%",
+            end: "top 140px",
+            scrub: true,
+          }
         });
+      });
 
-        // Animate bars when card enters
+      // Animate progress bars when card enters screen
+      wrappers.forEach((wrapper) => {
         ScrollTrigger.create({
-          trigger: card,
+          trigger: wrapper,
           start: "top 75%",
           onEnter: () => {
-            card.querySelectorAll<HTMLElement>(".sk-bar-fill").forEach(b => {
+            wrapper.querySelectorAll<HTMLElement>(".sk-bar-fill").forEach(b => {
               b.style.width = (b.dataset.p || "80") + "%";
             });
           },
+          onLeaveBack: () => {
+            wrapper.querySelectorAll<HTMLElement>(".sk-bar-fill").forEach(b => {
+              b.style.width = "0%";
+            });
+          }
         });
       });
     }
@@ -727,8 +730,11 @@ export default function Skills() {
       .sk-mob-hdr   { margin-bottom: 22px; }
 
       .sk-mob-card {
-        margin-bottom: 18px;
-        will-change: transform;
+        position: sticky;
+        top: 90px;
+        width: 100%;
+        transform-origin: center top;
+        will-change: transform, opacity, filter;
       }
       /* Mobile card — single column */
       .sk-mob-card .sk-card {
@@ -782,7 +788,7 @@ export default function Skills() {
           <h2 className="sec-h2" style={{marginBottom:0}}>My <span className="ghost">Toolkit</span></h2>
         </div>
         <Marquees />
-        <div style={{marginTop:"22px"}}>
+        <div className="sk-mob-stack-container" style={{marginTop:"32px", display:"flex", flexDirection:"column", gap:"40px", paddingBottom:"120px"}}>
           {SKILLS.map(cat => (
             <div key={cat.id} className="sk-mob-card">
               <SkillCard cat={cat}/>
