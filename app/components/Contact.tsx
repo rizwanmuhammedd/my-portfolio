@@ -136,12 +136,37 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "@/public/lib/gsap";
-import { Mail, Phone, Send } from "lucide-react";
+import { Mail, Phone, Send, CheckCircle, AlertCircle } from "lucide-react";
 
 export default function Contact() {
   const ref = useRef<HTMLElement>(null);
   const [form, setForm] = useState({ name:"", email:"", message:"" });
   const [state, setState] = useState<"idle"|"sending"|"sent">("idle");
+  const [toast, setToast] = useState<{
+    show: boolean;
+    message: string;
+    type: "success" | "error";
+    animatingOut: boolean;
+  } | null>(null);
+
+  const showToast = (message: string, type: "success" | "error" = "success") => {
+    setToast({ show: true, message, type, animatingOut: false });
+  };
+
+  useEffect(() => {
+    if (!toast) return;
+    if (toast.animatingOut) {
+      const timer = setTimeout(() => {
+        setToast(null);
+      }, 350);
+      return () => clearTimeout(timer);
+    } else {
+      const timer = setTimeout(() => {
+        setToast(prev => prev ? { ...prev, animatingOut: true } : null);
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   useEffect(() => {
     if (!ref.current) return;
@@ -180,7 +205,7 @@ export default function Contact() {
 
       if (response.ok) {
         setState("sent");
-        alert(`Thank you ${form.name}! Your message has been sent successfully.`);
+        showToast(`Thank you ${form.name}! Your message has been sent successfully.`, "success");
         setForm({ name: "", email: "", message: "" });
         setTimeout(() => setState("idle"), 2800);
       } else {
@@ -188,7 +213,7 @@ export default function Contact() {
       }
     } catch (error) {
       setState("idle");
-      alert(`Oops! There was a problem sending your message. You can also mail me directly at risvanmd172@gmail.com`);
+      showToast("Oops! There was a problem sending your message. Please try again.", "error");
     }
   };
 
@@ -219,6 +244,105 @@ export default function Contact() {
       .ct-sub:disabled{background:var(--border);color:var(--tm);cursor:not-allowed;}
       @media(max-width:1024px){.ct-grid{grid-template-columns:1fr;gap:36px;}}
       @media(max-width:640px){.ct-sec{padding:72px 0;}.ct-form{padding:24px 18px;}}
+
+      /* Toast Styles */
+      :root {
+        --err: #ef4444;
+      }
+      html.light {
+        --err: #d93838;
+      }
+      .toast-container {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 9999;
+        pointer-events: none;
+        animation: toastIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      .toast-container.toast-out {
+        animation: toastOut 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      @keyframes toastIn {
+        from { opacity: 0; transform: translateY(24px) scale(0.95); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+      }
+      @keyframes toastOut {
+        from { opacity: 1; transform: translateY(0) scale(1); }
+        to { opacity: 0; transform: translateY(24px) scale(0.95); }
+      }
+      .toast-body {
+        pointer-events: auto;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-left: 4px solid var(--ac);
+        padding: 16px 20px;
+        min-width: 320px;
+        max-width: 420px;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+        transition: all 0.3s ease;
+        font-family: 'Barlow', sans-serif;
+      }
+      html.light .toast-body {
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+      }
+      .toast-body.toast-error {
+        border-left-color: var(--err);
+      }
+      .toast-icon {
+        color: var(--ac);
+        flex-shrink: 0;
+      }
+      .toast-body.toast-error .toast-icon {
+        color: var(--err);
+      }
+      .toast-content {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+      }
+      .toast-title {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--tp);
+      }
+      .toast-desc {
+        font-size: 13px;
+        font-weight: 300;
+        color: var(--ts);
+        margin-top: 2px;
+        line-height: 1.4;
+      }
+      .toast-close {
+        background: none;
+        border: none;
+        color: var(--td);
+        font-size: 20px;
+        cursor: pointer;
+        padding: 4px;
+        line-height: 1;
+        transition: color 0.18s;
+      }
+      .toast-close:hover {
+        color: var(--tp);
+      }
+      @media (max-width: 640px) {
+        .toast-container {
+          bottom: 16px;
+          left: 16px;
+          right: 16px;
+        }
+        .toast-body {
+          min-width: 0;
+          width: 100%;
+        }
+      }
     `}</style>
     <section id="contact" className="ct-sec" ref={ref}>
       <div className="ct-inner">
@@ -260,5 +384,21 @@ export default function Contact() {
         </div>
       </div>
     </section>
+    {toast && (
+      <div className={`toast-container ${toast.animatingOut ? "toast-out" : ""}`}>
+        <div className={`toast-body toast-${toast.type}`}>
+          {toast.type === "success" ? (
+            <CheckCircle size={18} className="toast-icon" strokeWidth={2} />
+          ) : (
+            <AlertCircle size={18} className="toast-icon" strokeWidth={2} />
+          )}
+          <div className="toast-content">
+            <span className="toast-title">{toast.type === "success" ? "Success" : "Error"}</span>
+            <p className="toast-desc">{toast.message}</p>
+          </div>
+          <button className="toast-close" onClick={() => setToast(prev => prev ? { ...prev, animatingOut: true } : null)}>&times;</button>
+        </div>
+      </div>
+    )}
   </>);
 }
